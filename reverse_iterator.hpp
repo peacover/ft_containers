@@ -1,31 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   reverse_iterator.h                                 :+:      :+:    :+:   */
+/*   reverse_iterator.hpp                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 13:04:47 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/10 13:18:38 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/16 15:34:30 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
+#pragma once 
 
 #include <unistd.h>
 #include <iostream>
 #include <algorithm>
-
+#include "random_access_iterator.hpp"
 namespace ft
 {
 	template <typename T>
 	class reverse_iterator
 	{
 		public:
-			typedef typename ft::iterators_traits<T>::value_type			value_type;
-			typedef typename ft::iterators_traits<T>::iterator_category		iterator_category;
-			typedef typename ft::iterators_traits<T>::difference_type		difference_type;
-			typedef typename ft::iterators_traits<T>::reference				reference;
-			typedef typename ft::iterators_traits<T>::pointer				pointer;
 			typedef	T														iterator_type;
+			typedef typename ft::iterator_traits<T>::value_type				value_type;
+			typedef typename ft::iterator_traits<T>::iterator_category		iterator_category;
+			typedef typename ft::iterator_traits<T>::difference_type		difference_type;
+			typedef typename ft::iterator_traits<T>::reference				reference;
+			typedef typename ft::iterator_traits<T>::pointer				pointer;
 		public:
 			reverse_iterator() : _it(iterator_type()) {}
 			reverse_iterator(reverse_iterator const & src) : _it(src._it){}

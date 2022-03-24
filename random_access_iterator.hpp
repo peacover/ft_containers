@@ -6,14 +6,15 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/06 19:14:00 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/09 21:20:21 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/19 20:22:12 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once 
+
 #include <unistd.h>
 #include <iostream>
-#include <algorithm>
-
+#include "iterators_traits.hpp"
 namespace ft
 {
 	template <class Category, class T, class Distance = ptrdiff_t,
@@ -36,12 +37,23 @@ namespace ft
         	typedef typename ft::iterator<std::random_access_iterator_tag, T>::value_type			value_type;
 			typedef	T*																				pointer;
 			typedef	T&																				reference;
+
+			// typedef	T														iterator_type;
+			// typedef typename ft::iterator_traits<T>::value_type				value_type;
+			// typedef typename ft::iterator_traits<T>::iterator_category		iterator_category;
+			// typedef typename ft::iterator_traits<T>::difference_type		difference_type;
+			// typedef typename ft::iterator_traits<T>::reference				reference;
+			// typedef typename ft::iterator_traits<T>::pointer				pointer;
 		
 		public:
 			random_access_iterator() : _ptr(nullptr) {}
 			~random_access_iterator() {}
 			random_access_iterator(pointer ptr) : _ptr(ptr) { }
 			random_access_iterator(random_access_iterator const & src) : _ptr(src._ptr){}
+			operator random_access_iterator<const value_type>() const
+            {
+                return random_access_iterator<const value_type>(_ptr);
+            }
 			random_access_iterator & operator=(random_access_iterator const & src)
 			{
 				if (this != &src)
