@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/19 17:00:44 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/19 17:09:49 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/29 18:27:09 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ namespace ft
     template< class T >
     struct is_integral
     {
-        static const bool value /* = true if T is integral, false otherwise */;
+        static const bool value = false /* = true if T is integral, false otherwise */;
     };
     // specialisation
     template <> struct is_integral<bool> { static const bool value = true; };

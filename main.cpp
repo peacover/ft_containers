@@ -80,7 +80,7 @@
 #include <vector>       
 #include <iterator>
 #include <iostream>
-
+#include "vector.hpp"
 
 // bool mypredicate (int i, int j) {
 //   return (i==j);
@@ -110,10 +110,25 @@
 int main()
 {
 	int myints[] = {20,40,60,80,100};
-	std::vector<int>v (myints, myints+5);
+	ft::vector<int>v (5, 77);
 
-	std::vector<int>::iterator it;
-	v.insert(v.end() + 2, 77);
-	for (std::vector<int>::iterator i = v.begin(); i != v.end(); i++)
+	// ft::vector<int>::iterator it;
+	// v.insert(v.end() + 2, 77);
+	ft::vector<int>::iterator it;
+	for (ft::vector<int>::iterator i = v.begin(); i != v.end(); i++)
+	{
 		std::cout << *i << std::endl;
+	}
+	
+	std::cout << "-------------------------------------" << std::endl;
+	
+	for (int i = 0; i < v.size(); ++i)
+      std::cout << v[i] << std::endl;
+
+	std::cout << "-------------------------------------" << std::endl;
+	ft::vector<int> v2(v.begin(), v.end());
+	for (int i = 0; i < v2.size(); ++i)
+      std::cout << v2[i] << std::endl;
+	// ft::vector<int>my_v;
+	// std::cout << my_v.begin() << std::endl;
 }

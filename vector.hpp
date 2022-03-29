@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/10 13:33:02 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/29 15:43:56 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/29 18:27:47 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ namespace ft
 					_alloc.construct(_data + i, val);
 				if (!i)
 					_data = nullptr;
-				_size = i + 1;
+				_size = i;
 			}
 			template <class InputIterator>
          	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
@@ -92,6 +92,9 @@ namespace ft
 			}
 			vector(const vector& x)
 			{
+				// _size = 0;
+				// _capacity = 0;
+				// _data = nullptr;
 				*this = x;
 			}
 			~vector()
@@ -107,7 +110,11 @@ namespace ft
 					_capacity = x._capacity;
 					_data = _alloc.allocate(x._size);
 					for (size_t i = 0; i < x._size; i++)
-						_data[i] = x._data[i];
+					{
+						_alloc.construct(_data + i, x._data + i);
+					}
+					// for (size_t i = 0; i < x._size; i++)
+					// 	_data[i] = x._data[i];
 				}
 				return (*this);
 			}

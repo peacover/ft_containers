@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/06 19:14:00 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/29 08:23:47 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/29 18:17:29 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,10 @@ namespace ft
 			// typedef typename ft::iterator_traits<T>::pointer				pointer;
 		
 		public:
-			random_access_iterator() : _ptr(nullptr) {}
-			~random_access_iterator() {}
-			random_access_iterator(pointer ptr) : _ptr(ptr) { }
-			random_access_iterator(random_access_iterator const & src) : _ptr(src._ptr){}
+			random_access_iterator() : _ptr(nullptr) {};
+			virtual ~random_access_iterator() {};
+			random_access_iterator(pointer ptr) : _ptr(ptr) { };
+			random_access_iterator(random_access_iterator const & src) : _ptr(src._ptr){};
 			pointer	base() const
 			{
 				return (_ptr);
