@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/10 13:33:02 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/24 18:53:58 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/29 15:43:56 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,18 +52,43 @@ namespace ft
 			}
 			explicit vector (size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type())
 			{
+				size_t i;
+
 				_alloc = alloc;	
-				_size = n;
 				_capacity = n;
-				_data = _alloc.allocate(_size);
-				for (size_t i = 0; i < n; i++)
-					_data[i] = val;
+				_data = _alloc.allocate(n);
+				for (i = 0; i < n; i++)
+					_alloc.construct(_data + i, val);
+				if (!i)
+					_data = nullptr;
+				_size = i + 1;
 			}
 			template <class InputIterator>
          	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
 			 		typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
 			{
-				
+				size_t n = 0;
+				_alloc = alloc;
+				for (InputIterator it = first; it != last; it++)
+					n++;
+				if (!n)
+				{
+					_data = nullptr;
+					_size = 0;
+					_capacity = 0;
+				}
+				else
+				{
+					_capacity = n + 1;
+					_data = _alloc.allocate(n + 1);
+					for (size_t i = 0; i < n; i++)
+					{
+						_alloc.construct(_data + i, *first);
+						_size = i;
+						first++;
+					}
+					_size++;
+				}
 			}
 			vector(const vector& x)
 			{
@@ -215,16 +240,16 @@ namespace ft
 
 			////////////////// MODIFIERS /////////////////////
 			
-			template <class InputIterator>
-  			void assign (InputIterator first, InputIterator last,
-			  			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
-			{
+			// template <class InputIterator>
+  			// void assign (InputIterator first, InputIterator last,
+			//   			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
+			// {
 								  
-			}
-			void assign (size_type n, const value_type& val)
-			{
+			// }
+			// void assign (size_type n, const value_type& val)
+			// {
 				
-			}
+			// }
 			
 			void push_back (const value_type& val)
 			{
@@ -236,22 +261,22 @@ namespace ft
 				resize(_size - 1);
 			}
 
-			iterator insert (iterator position, const value_type& val)
-			{
-				// resize(_size + 1);
+			// iterator insert (iterator position, const value_type& val)
+			// {
+			// 	size_type dist = position - begin();
+			// 	if ()
 				
+			// }
+			// void insert (iterator position, size_type n, const value_type& val)
+			// {
 				
-			}
-			void insert (iterator position, size_type n, const value_type& val)
-			{
+			// }
+			// template <class InputIterator>
+    		// void insert (iterator position, InputIterator first, InputIterator last,
+			// 			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
+			// {
 				
-			}
-			template <class InputIterator>
-    		void insert (iterator position, InputIterator first, InputIterator last,
-						typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
-			{
-				
-			}
+			// }
 
 			// iterator erase (iterator position);
 			// iterator erase (iterator first, iterator last);
@@ -268,16 +293,16 @@ namespace ft
 				x._data = tmp_data;
 				
 				tmp_size = _size;
-				_size = x_size;
+				_size = x._size;
 				x._size = tmp_size;
 
 				tmp_capacity = _capacity;
-				_capacity = x_capacity;
+				_capacity = x._capacity;
 				x._capacity = tmp_capacity;
 
-				tmp_alloc = _alloc;
-				_alloc = x_alloc;
-				x._alloc = tmp_alloc;
+				tmp_allocator_type = _alloc;
+				_alloc = x._alloc;
+				x._alloc = tmp_allocator_type;
 				
 				
 			}
@@ -323,7 +348,7 @@ namespace ft
 	template <class T, class Alloc>
 	bool operator>  (const vector<T,Alloc>& lhs, const vector<T,Alloc>& rhs)
 	{
-		if (ft::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end()));
+		return (ft::lexicographical_compare(rhs.begin(), rhs.end(), lhs.begin(), lhs.end()));
 	}
 	
 	template <class T, class Alloc>
