@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/10 13:33:02 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/29 18:27:47 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/03/30 19:37:28 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ namespace ft
 				_size = i;
 			}
 			template <class InputIterator>
-         	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
+		 	vector (InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type(),
 			 		typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
 			{
 				size_t n = 0;
@@ -145,7 +145,7 @@ namespace ft
 			{
 				return (reverse_iterator(end()));
 			}
-      		reverse_iterator rend()
+	  		reverse_iterator rend()
 			{
 				return (reverse_iterator(begin()));
 			}
@@ -247,16 +247,30 @@ namespace ft
 
 			////////////////// MODIFIERS /////////////////////
 			
-			// template <class InputIterator>
-  			// void assign (InputIterator first, InputIterator last,
-			//   			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
-			// {
-								  
-			// }
-			// void assign (size_type n, const value_type& val)
-			// {
-				
-			// }
+			template <class InputIterator>
+  			void assign (InputIterator first, InputIterator last,
+			  			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
+			{
+				difference_type n = 0;
+				for (InputIterator it = first; it != last; it++)
+					n++;
+				_size = n;
+				if (n > _capacity)
+					reserve(n);
+				for (size_t i = 0; i < _size; i++)
+				{
+					_alloc.construct(_data + i, *first);
+					first++;
+				}
+			}
+			void assign (size_type n, const value_type& val)
+			{
+				_size = n;
+				if (n > _capacity)
+					reserve(n);
+				for (size_t i = 0; i < _size; i++)
+					_alloc.construct(_data + i, val);
+			}
 			
 			void push_back (const value_type& val)
 			{
@@ -265,25 +279,73 @@ namespace ft
 			}
 			void pop_back()
 			{
-				resize(_size - 1);
+				_size--;
 			}
 
-			// iterator insert (iterator position, const value_type& val)
-			// {
-			// 	size_type dist = position - begin();
-			// 	if ()
-				
-			// }
-			// void insert (iterator position, size_type n, const value_type& val)
-			// {
-				
-			// }
-			// template <class InputIterator>
-    		// void insert (iterator position, InputIterator first, InputIterator last,
-			// 			typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
-			// {
-				
-			// }
+			iterator insert (iterator position, const value_type& val)
+			{
+				difference_type dist = position - begin();
+
+				if (!_size)
+					resize(1);
+				else if (_size >= _capacity)
+					reserve(_capacity * 2);
+				_size++;
+				for (size_t i = _size; i >= dist; i--)
+				{
+					if (i == dist)
+						_alloc.construct(_data + dist, val);
+					else
+						_data[i] = _data[i - 1];
+				}
+				return (begin() + dist);
+			}
+			void insert (iterator position, size_type n, const value_type& val)
+			{
+				difference_type dist = position - begin();
+
+				if (!_size)
+					resize(n);
+				else if (_size + n > _capacity)
+				{
+					if (_size > n)
+						reserve(_capacity * 2);
+					else
+						reserve(_size + n);
+				}
+				for (size_t i = _size - 1; i > dist; i--)
+					_data[i + n] = _data[i];
+				for (size_t i = 0; i < n; i++)
+					_data[dist + i] = val;
+				_size += n;
+			}
+			template <class InputIterator>
+			void insert (iterator position, InputIterator first, InputIterator last,
+						typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
+			{
+				difference_type dist = position - begin();
+				// difference_type n = last - first;
+				difference_type n = 0;
+				for (InputIterator it = first; it != last; it++)
+					n++;
+				if (!_size)
+					resize(n);
+				else if (_size + n > _capacity)
+				{
+					if (_size > n)
+						reserve(_capacity * 2);
+					else
+						reserve(_size + n);
+				}
+				for (size_t i = _size - 1; i > dist; i--)
+					_data[i + n] = _data[i];
+				for (size_t i = 0; i < n; i++)
+				{
+					_data[dist + i] = *first;
+					first++;
+				}
+				_size += n;
+			}
 
 			// iterator erase (iterator position);
 			// iterator erase (iterator first, iterator last);

@@ -110,14 +110,16 @@
 int main()
 {
 	int myints[] = {20,40,60,80,100};
-	ft::vector<int>v (5, 77);
 
 	// ft::vector<int>::iterator it;
 	// v.insert(v.end() + 2, 77);
+	ft::vector<int>v (5, 77);
+	ft::vector<int>v2 (5, 88);
 	ft::vector<int>::iterator it;
-	for (ft::vector<int>::iterator i = v.begin(); i != v.end(); i++)
+	for (it = v.begin(); it != v.end(); it++)
 	{
-		std::cout << *i << std::endl;
+		std::cout << *it << std::endl;
+		// break;
 	}
 	
 	std::cout << "-------------------------------------" << std::endl;
@@ -126,9 +128,11 @@ int main()
       std::cout << v[i] << std::endl;
 
 	std::cout << "-------------------------------------" << std::endl;
-	ft::vector<int> v2(v.begin(), v.end());
-	for (int i = 0; i < v2.size(); ++i)
-      std::cout << v2[i] << std::endl;
+	// ft::vector<int> v2(v.begin(), v.end());
+	// v.insert(v.begin() + 2, v2.begin() + 3, v2.end());
+	v.assign(v2.begin(), v2.end() - 2);
+	for (int i = 0; i < v.size(); ++i)
+      std::cout << v[i] << std::endl;
 	// ft::vector<int>my_v;
 	// std::cout << my_v.begin() << std::endl;
 }
