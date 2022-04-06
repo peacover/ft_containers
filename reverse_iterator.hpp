@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/07 13:04:47 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/29 09:51:20 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/04/02 13:15:09 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ namespace ft
 				tmp = x;
 				_it = --tmp;
 			}
-			template <class U> reverse_iterator(const reverse_iterator<U>& u)
+			template <class U>
+			reverse_iterator(const reverse_iterator<U>& u)
 			{
 				_it = --(u.base());
 			}
@@ -78,13 +79,13 @@ namespace ft
 			}
 			pointer operator->()
 			{
-				return (_it);
+				return &(operator*());
 			}
-			reverse_iterator operator-(difference_type n)
+			reverse_iterator operator-(difference_type n) const
 			{
 				return (reverse_iterator(_it + (n + 1)));
 			}
-			reverse_iterator operator+(difference_type n)
+			reverse_iterator operator+(difference_type n) const
 			{
 				return (reverse_iterator(_it - (n - 1)));
 			}
@@ -113,7 +114,7 @@ namespace ft
     template <class T>
     typename reverse_iterator<T>::difference_type operator-(const reverse_iterator<T>& lhs, const reverse_iterator<T>& rhs)
     {
-        return (lhs.base() - rhs.base());
+        return (rhs.base() - lhs.base());
     }
 
 	template <class T>

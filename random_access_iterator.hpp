@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/06 19:14:00 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/03/29 18:17:29 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/04/02 13:09:56 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,14 +94,15 @@ namespace ft
 			pointer operator->()
 			{
 				return (_ptr);
+				// return &(operator*());
 			}
-			random_access_iterator operator-(difference_type n)
+			random_access_iterator operator-(difference_type n) const
 			{
-				return (random_access_iterator(_ptr - n));
+				return (_ptr - n);
 			}
-			random_access_iterator operator+(difference_type n)
+			random_access_iterator operator+(difference_type n) const
 			{
-				return (random_access_iterator(_ptr + n));
+				return (_ptr + n);
 			}
 			random_access_iterator & operator+=(difference_type n)
 			{
