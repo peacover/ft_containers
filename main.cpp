@@ -82,6 +82,8 @@
 #include <iostream>
 #include "vector.hpp"
 
+#include "pair.hpp"
+
 // bool mypredicate (int i, int j) {
 //   return (i==j);
 // }
@@ -113,7 +115,8 @@ int main()
 
 	// ft::vector<int>::iterator it;
 	// v.insert(v.end() + 2, 77);
-	// ft::vector<int>v (5, 88);
+	ft::vector<int>v (5, 88);
+	ft::vector<int>v2;
 	// std::vector<int>v2 (5, 88);
 	// ft::vector<int>v3;
 	// ft::vector<int>v2 (5, 88);
@@ -129,7 +132,7 @@ int main()
 	// for (int i = 0; i < v.size(); ++i)
     //   std::cout << v[i] << std::endl;
 
-	std::cout << "-------------------------------------" << std::endl;
+	// std::cout << "-------------------------------------" << std::endl;
 	// ft::vector<int> v2(v.begin(), v.end());
 	// v.insert(v.begin() + 2, v2.begin() + 3, v2.end());
 	
@@ -146,32 +149,46 @@ int main()
 	// 	std::cout << v[i] << std::endl;
 
 	 /*------------------ std::vectors ---------------------*/
-        std::vector<std::string> v1(10, "string2");          // fill constructor
-        std::vector<std::string> v2;                         // empty constructor
-        std::vector<std::string> v3(v1.begin(), v1.end());   // range constructor with normal iterators
-        std::vector<std::string> v4(v3);                     // copy constructor
-        std::vector<std::string> v5(v1.rbegin(), v1.rend()); // range constructor with reverse iterators
-        /*-----------------------------------------------------*/
-        /*------------------ ft::vectors ---------------------*/
-        ft::vector<std::string> ft_v1(10, "string2");
-        ft::vector<std::string> ft_v2;
-        ft::vector<std::string> ft_v3(ft_v1.begin(), ft_v1.end());
-        ft::vector<std::string> ft_v4(ft_v1);
-        ft::vector<std::string> ft_v5(ft_v1.rbegin(), ft_v1.rend());
-        /*----------------------------------------------------*/
-        if (v1.capacity() == ft_v1.capacity() && v2.capacity() == ft_v2.capacity()
-			&& v3.capacity() == ft_v3.capacity() && v4.capacity() == ft_v4.capacity() && v5.capacity() == ft_v5.capacity())
-			printf("SUCCESS!");
-		else
-		{
-			printf ("v1 %ld | %ld \n", v1.capacity(), ft_v1.capacity());
-			printf ("v2 %ld | %ld \n", v2.capacity(), ft_v2.capacity());
-			printf ("v3 %ld | %ld \n", v3.capacity(), ft_v3.capacity());
-			printf ("v4 %ld | %ld \n", v4.capacity(), ft_v4.capacity());
-			printf ("v5 %ld | %ld \n", v5.capacity(), ft_v5.capacity());
-			printf("FAILED\n");
-		}
+        // std::vector<std::string> v1(10, "string2");          // fill constructor
+        // std::vector<std::string> v2;                         // empty constructor
+        // std::vector<std::string> v3(v1.begin(), v1.end());   // range constructor with normal iterators
+        // std::vector<std::string> v4(v3);                     // copy constructor
+        // std::vector<std::string> v5(v1.rbegin(), v1.rend()); // range constructor with reverse iterators
+        // /*-----------------------------------------------------*/
+        // /*------------------ ft::vectors ---------------------*/
+        // ft::vector<std::string> ft_v1(10, "string2");
+        // ft::vector<std::string> ft_v2;
+        // ft::vector<std::string> ft_v3(ft_v1.begin(), ft_v1.end());
+        // ft::vector<std::string> ft_v4(ft_v1);
+        // ft::vector<std::string> ft_v5(ft_v1.rbegin(), ft_v1.rend());
+        // /*----------------------------------------------------*/
+        // if (v1.capacity() == ft_v1.capacity() && v2.capacity() == ft_v2.capacity()
+		// 	&& v3.capacity() == ft_v3.capacity() && v4.capacity() == ft_v4.capacity() && v5.capacity() == ft_v5.capacity())
+		// 	printf("SUCCESS!\n");
+		// else
+		// {
+		// 	printf ("v1 %ld | %ld \n", v1.capacity(), ft_v1.capacity());
+		// 	printf ("v2 %ld | %ld \n", v2.capacity(), ft_v2.capacity());
+		// 	printf ("v3 %ld | %ld \n", v3.capacity(), ft_v3.capacity());
+		// 	printf ("v4 %ld | %ld \n", v4.capacity(), ft_v4.capacity());
+		// 	printf ("v5 %ld | %ld \n", v5.capacity(), ft_v5.capacity());
+		// 	printf("FAILED\n");
+		// }
+		std::cout << "-------------------------------------------------------------------------------" << std::endl;
+		ft::pair<int, int> p;
+		std::cout << p.first << " | " << p.second << std::endl;
 		std::cout << "-------------------------------------" << std::endl;
-	// ft::vector<int>my_v;
-	// std::cout << my_v.begin() << std::endl;
+		ft::pair<int, int> p1(12, 88);
+		std::cout << p1.first << " | " << p1.second << std::endl;
+		std::cout << "-------------------------------------" << std::endl;
+		ft::pair<int, int> p2(p1);
+		std::cout << p2.first << " | " << p2.second << std::endl;
+		std::cout << "-------------------------------------------------------------------------------" << std::endl;
+		for (int i = 0; i < v.size(); ++i)
+			std::cout << v[i] << std::endl;
+		std::cout << "-------------------------------------" << std::endl;
+		for (int i = 0; i < v2.size(); ++i)
+			std::cout << v2[i] << std::endl;
+		
+		
 }

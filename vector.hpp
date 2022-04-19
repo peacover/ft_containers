@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/10 13:33:02 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/04/06 02:22:19 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/04/19 02:54:37 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,9 +92,9 @@ namespace ft
 			}
 			vector(const vector& x)
 			{
-				// _size = 0;
-				// _capacity = 0;
-				// _data = nullptr;
+				_size = 0;
+				_capacity = 0;
+				_data = nullptr;
 				*this = x;
 			}
 			~vector()
@@ -110,11 +110,9 @@ namespace ft
 					_capacity = x._capacity;
 					_data = _alloc.allocate(x._size);
 					for (size_t i = 0; i < x._size; i++)
-					{
-						_data[i] = x._data[i];
-					}
-					// for (size_t i = 0; i < x._size; i++)
-					// 	_data[i] = x._data[i];
+						_alloc.construct(_data + i, x._data[i]);
+
+						// _data[i] = x._data[i];
 				}
 				return (*this);
 			}
@@ -183,7 +181,10 @@ namespace ft
 					return;
 				value_type *tmp = _alloc.allocate(n);
 				for (size_t i = 0; i < _size; i++)
-					tmp[i] = _data[i];
+				{
+					_alloc.construct(tmp + i, _data[i]);
+					// tmp[i] = _data[i];
+				}
 				_capacity = n;
 				_alloc.deallocate(_data, _capacity);
 				_data = tmp;
@@ -197,7 +198,10 @@ namespace ft
 					else if (n >= _capacity)
 						reserve(_capacity * 2);
 					while (_size < n)
-						_data[_size++] = val;
+					{
+						_alloc.construct(_data + (_size++), val);
+						// _data[_size++] = val;
+					}
 				}
 				else 
 				{
@@ -281,7 +285,8 @@ namespace ft
 					reserve (1);
 				else if (_size + 1 > _capacity)
 					reserve (_capacity * 2);
-				_data[_size] = val;
+				_alloc.construct(_data + _size, val);
+				// _data[_size] = val;
 				_size++;
 			}
 			void pop_back()
@@ -303,7 +308,10 @@ namespace ft
 					reserve(_capacity * 2);
 				_size++;
 				for (long i = _size; i > dist; i--)
-					_data[i] = _data[i - 1];
+				{
+					// _data[i] = _data[i - 1];
+					_alloc.construct(_data + i, _data[i - 1]);
+				}
 				_alloc.construct(_data + dist, val);
 				return (begin() + dist);
 			}
@@ -321,9 +329,15 @@ namespace ft
 						reserve(_capacity * 2);
 				}
 				for (long i = _size - 1; i >= dist; i--)
-					_data[i + n] = _data[i];
+				{
+					_alloc.construct(_data + i + n, _data[i]);
+					// _data[i + n] = _data[i];
+				}
 				for (size_t i = 0; i < n; i++)
-					_data[dist + i] = val;
+				{
+					_alloc.construct(_data + dist + i, val);
+					// _data[dist + i] = val;
+				}
 				_size += n;
 			}
 			template <class InputIterator>
@@ -331,7 +345,6 @@ namespace ft
 						typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type = InputIterator())
 			{
 				difference_type dist = position - begin();
-				// difference_type n = last - first;
 				difference_type n = 0;
 				for (InputIterator it = first; it != last; it++)
 					n++;
@@ -345,10 +358,14 @@ namespace ft
 						reserve(_capacity * 2);
 				}
 				for (long i = _size - 1; i >= dist; i--)
-					_data[i + n] = _data[i];
+				{
+					// _data[i + n] = _data[i];
+					_alloc.construct(_data + i + n, _data[i]);
+				}
 				for (long i = 0; i < n; i++)
 				{
-					_data[dist + i] = *first;
+					// _data[dist + i] = *first;
+					_alloc.construct(_data + dist + i, *first);
 					first++;
 				}
 				_size += n;
