@@ -1,0 +1,277 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    tttt                                               :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#              #
+#    Updated: 2022/04/25 03:04:10 by yer-raki         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+#pragma once 
+
+#include <unistd.h>
+#include <iostream>
+#define	COUNT 10;
+
+namespace ft
+{
+	typedef struct	Node
+	{
+		// pair key value
+		int		value;
+		Node	*left;
+		Node	*right;
+		Node	*parent;
+		int		height; 
+	}				Node;
+	// template <typename T>
+	class avl
+	{
+		public:
+
+		//////////////////////////// PRINT TREE //////////////////////////////
+		void print2DUtil(Node *root, int space)
+		{
+			// Base case
+			if (root == NULL)
+				return;
+		
+			// Increase distance between levels
+			space += COUNT;
+		
+			// Process right child first
+			print2DUtil(root->right, space);
+		
+			// Print current node after space
+			// count
+			std::cout<< std::endl;
+			int i = COUNT;
+			while (i < space)
+			{
+				std::cout<< " ";
+				i++;	
+			}
+			// for (int i = COUNT; i < space; i++)
+			// {
+			// 	std::cout<< " ";
+			// }
+			std::cout<<root->value<<"\n";
+		
+			// Process left child
+			print2DUtil(root->left, space);
+		}	
+		// Wrapper over print2DUtil()
+		
+		void print2D()
+		{
+			// Pass initial space count as 0
+			Node *root = this->_root;
+			print2DUtil(root, 0);
+		}
+		//////////////////////////////////////////////////////////////////////////
+			avl()
+			{
+				this->_root = NULL;
+			}
+			int height(Node *head)
+			{
+				if (head == NULL)
+					return 0;
+				return head->height;
+			}
+			Node	*ll_rotation(Node *head)
+			{
+				Node *tmp = head->left;
+				head->left = tmp->right;
+				tmp->right = head;
+				head->height = std::max(height(head->left), height(head->right)) + 1;
+				tmp->height = std::max(height(tmp->left), height(tmp->right)) + 1;
+				return (tmp);
+			}
+			Node	*rr_rotation(Node *head)
+			{
+				Node *tmp = head->right;
+				head->right = tmp->left;
+				tmp->left = head;
+				head->height = std::max(height(head->left), height(head->right)) + 1;
+				tmp->height = std::max(height(tmp->left), height(tmp->right)) + 1;
+				return (tmp);
+			}
+			Node	*lr_rotation(Node *head)
+			{
+				head->left = rr_rotation(head->left);
+				return (ll_rotation(head));
+			}
+			Node	*rl_rotation(Node *head)
+			{
+				head->right = ll_rotation(head->right);
+				return (rr_rotation(head));
+			}
+			Node *new_node(int value)
+			{
+				Node *tmp = new Node;
+				tmp->value = value;
+				tmp->left = NULL;
+				tmp->right = NULL;
+				tmp->parent = NULL;
+				tmp->height = 1;
+				return (tmp);
+			}
+			// void	balance_my_tree(Node *head)
+			// {
+			// 	std::cout << "-------------- OLD TREE --------------" << std::endl;
+			// 	print_my_tree();
+			// 	std::cout << "-------------- NEW TREE --------------" << std::endl;
+			// 	ll_rotation(head);
+			// 	print_my_tree();
+			// }
+			void	insert_in_my_tree(int value)
+			{
+				Node *tmp = new_node(value);
+				if (this->_root == NULL)
+				{
+					this->_root = tmp;
+					// _root->height = 0;
+					std::cout << "inserted root : " << value << std::endl;
+					return ;
+				}
+				Node *tmp_parent = this->_root;
+				while (tmp_parent)
+				{
+					if (tmp_parent->value > value)
+					{
+						if (tmp_parent->left == NULL)
+						{
+							tmp_parent->left = tmp;
+							tmp->parent = tmp_parent;
+							std::cout << "----------------------------" << std::endl;
+							std::cout << "inserted left : " << value << std::endl;
+							std::cout << "my parent : " << tmp_parent->value << std::endl;
+							std::cout << "----------------------------" << std::endl;
+							
+							break ;
+						}
+						tmp_parent = tmp_parent->left;
+					}
+					else
+					{
+						if (tmp_parent->right == NULL)
+						{
+							tmp_parent->right = tmp;
+							tmp->parent = tmp_parent;
+							std::cout << "----------------------------" << std::endl;
+							std::cout << "inserted right : " << value << std::endl;
+							std::cout << "my parent : " << tmp_parent->value << std::endl;
+							std::cout << "----------------------------" << std::endl;
+							break ;
+						}
+						tmp_parent = tmp_parent->right;
+					}
+				}
+			}
+			int		balance_factor(Node *head)
+			{
+				int  left_height = height(head->left);
+				int  right_height = height(head->right);
+				return (left_height - right_height);
+			}
+			void 	balance_my_tree()
+			{
+				Node *tmp = this->_root;
+				while (tmp)
+				{
+					if (balance_factor(tmp) == 2)
+					{
+						if (balance_factor(tmp->left) == 1)
+							tmp = ll_rotation(tmp);
+						else
+							tmp = lr_rotation(tmp);
+						// std::cout << "balance factor : " << balance_factor(tmp)  << " | tmp_value : " << tmp->value << " | parent_value : " << tmp->parent->value << std::endl;
+						_root = tmp;
+						// std::cout << "tmp_right : " << tmp->right->value << " | tmp_left : " << tmp->left->value  << " | current_value : " << tmp->value << std::endl;
+						break;
+					}
+					else if (balance_factor(tmp) == -2)
+					{
+						if (balance_factor(tmp->right) == -1)
+							tmp = rl_rotation(tmp);
+						else
+							tmp = rr_rotation(tmp);
+						_root = tmp;
+						break;
+					}
+					tmp = tmp->parent;
+				}
+			}
+			
+			void	avl_insert(int value)
+			{
+				insert_in_my_tree(value);
+				balance_my_tree();
+			}
+			void	avl_delete(int value)
+			{
+				Node *tmp = this->_root;
+				while (tmp)
+				{
+					if (tmp->value == value)
+					{
+						if (tmp->left == NULL && tmp->right == NULL)
+						{
+							if (tmp->parent->left == tmp)
+								tmp->parent->left = NULL;
+							else
+								tmp->parent->right = NULL;
+							delete tmp;
+							break ;
+						}
+						else if (tmp->left == NULL)
+						{
+							if (tmp->parent->left == tmp)
+								tmp->parent->left = tmp->right;
+							else
+								tmp->parent->right = tmp->right;
+							tmp->right->parent = tmp->parent;
+							delete tmp;
+							break ;
+						}
+						else if (tmp->right == NULL)
+						{
+							if (tmp->parent->left == tmp)
+								tmp->parent->left = tmp->left;
+							else
+								tmp->parent->right = tmp->left;
+							tmp->left->parent = tmp->parent;
+							delete tmp;
+							break ;
+						}
+						else
+						{
+							Node *tmp_parent = tmp->right;
+							while (tmp_parent->left)
+								tmp_parent = tmp_parent->left;
+							tmp->value = tmp_parent->value;
+							if (tmp_parent->parent->left == tmp_parent)
+								tmp_parent->parent->left = tmp_parent->right;
+							else
+								tmp_parent->parent->right = tmp_parent->right;
+							if (tmp_parent->right)
+								tmp_parent->right->parent = tmp_parent->parent;
+							delete tmp_parent;
+							break ;
+						}
+					}
+					else if (tmp->value > value)
+						tmp = tmp->left;
+					else
+						tmp = tmp->right;
+				}
+				balance_my_tree();
+			}
+		private:
+			Node *_root;
+	};
+};

@@ -81,7 +81,7 @@
 #include <iterator>
 #include <iostream>
 #include "vector.hpp"
-
+#include "avl.hpp"
 #include "pair.hpp"
 
 // bool mypredicate (int i, int j) {
@@ -111,12 +111,12 @@
 
 int main()
 {
-	int myints[] = {20,40,60,80,100};
+	// int myints[] = {20,40,60,80,100};
 
 	// ft::vector<int>::iterator it;
 	// v.insert(v.end() + 2, 77);
-	ft::vector<int>v (5, 88);
-	ft::vector<int>v2;
+	// ft::vector<int>v (5, 88);
+	// ft::vector<int>v2;
 	// std::vector<int>v2 (5, 88);
 	// ft::vector<int>v3;
 	// ft::vector<int>v2 (5, 88);
@@ -174,21 +174,20 @@ int main()
 		// 	printf ("v5 %ld | %ld \n", v5.capacity(), ft_v5.capacity());
 		// 	printf("FAILED\n");
 		// }
-		std::cout << "-------------------------------------------------------------------------------" << std::endl;
-		ft::pair<int, int> p;
-		std::cout << p.first << " | " << p.second << std::endl;
-		std::cout << "-------------------------------------" << std::endl;
-		ft::pair<int, int> p1(12, 88);
-		std::cout << p1.first << " | " << p1.second << std::endl;
-		std::cout << "-------------------------------------" << std::endl;
-		ft::pair<int, int> p2(p1);
-		std::cout << p2.first << " | " << p2.second << std::endl;
-		std::cout << "-------------------------------------------------------------------------------" << std::endl;
-		for (int i = 0; i < v.size(); ++i)
-			std::cout << v[i] << std::endl;
-		std::cout << "-------------------------------------" << std::endl;
-		for (int i = 0; i < v2.size(); ++i)
-			std::cout << v2[i] << std::endl;
-		
+		// std::cout << "-------------------------------------------------------------------------------" << std::endl;
+		// ft::pair<int, int> p;
+		// std::cout << p.first << " | " << p.second << std::endl;
+		// std::cout << "-------------------------------------" << std::endl;
+		// ft::pair<int, int> p1(12, 88);
+		// std::cout << p1.first << " | " << p1.second << std::endl;
+		// std::cout << "-------------------------------------" << std::endl;
+		// ft::pair<int, int> p2(p1);
+		// std::cout << p2.first << " | " << p2.second << std::endl;
+		// std::cout << "-------------------------------------------------------------------------------" << std::endl;
+		// for (int i = 0; i < v.size(); ++i)
+		// 	std::cout << v[i] << std::endl;
+		// std::cout << "-------------------------------------" << std::endl;
+		// for (int i = 0; i < v2.size(); ++i)
+		// 	std::cout << v2[i] << std::endl;
 		
 }
