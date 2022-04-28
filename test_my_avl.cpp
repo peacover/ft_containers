@@ -4,14 +4,14 @@
 
 int main()
 {
-    ft::avl avl;
-    avl.avl_insert(10);
-    // avl.avl_insert(11);
-    // avl.avl_insert(5);
-    // avl.avl_insert(7);
-    avl.avl_insert(20);
-    avl.avl_insert(30);
-    avl.avl_insert(40);
-    avl.avl_insert(50);
-    avl.print2D();
+    ft::avl<int, int> tree;
+
+    tree.insert(ft::make_pair(10, 3)); 
+    tree.insert(ft::make_pair(30, 4));
+    tree.insert(ft::make_pair(20, 3));
+    tree.insert(ft::make_pair(40, 5));
+
+    // tree.remove(20);
+    tree.print2D();
+
 }
