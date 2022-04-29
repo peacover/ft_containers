@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/04/28 01:39:13 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/04/29 02:44:43 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,6 @@
 #define COUNT 10;
 namespace ft
 {
-	// template <typename T>
-	// struct	Node
-	// {
-	// 	T		value;
-	// 	Node<T>	*left;
-	// 	Node<T>	*right;
-	// 	Node<T>	*parent;
-	// 	int		bf;
-	// 	int		height;
-	// };
 	template<class T>
 	class Node
 	{
@@ -43,25 +33,38 @@ namespace ft
 		public :
 			Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {};
 			~Node(){};
-	};
+	}; 
 	template < class Key,                                  			// map::key_type
-           class T,                                       			// map::mapped_type
-           class Compare = std::less<Key>,                     		// map::key_compare
-           class Alloc = std::allocator<ft::pair<const Key,T> >		// map::allocator_type
-           >
+		class T,                                       				// map::mapped_type
+		class Compare = std::less<Key>,                     		// map::key_compare
+		class Alloc = std::allocator<ft::pair<const Key,T> >		// map::allocator_type
+		>
 	class avl
 	{
-		typedef T 													mapped_type;
-		typedef Key													key_type;
-		typedef ft::pair<const key_type, mapped_type>				value_type;
-		typedef Alloc 												pair_alloc;
+		typedef T 															mapped_type;
+		typedef Key															key_type;
+		typedef ft::pair<const key_type, mapped_type>						value_type;
+		typedef Alloc 														pair_alloc;
         typedef typename Alloc::template rebind<Node<value_type> >::other	node_alloc;
-		typedef Node<value_type>									*node_pointer ;
+		typedef Node<value_type>											*node_pointer;
 		public:
 			avl()
 			{
 				_root = nullptr;
 				_node_size = 0;
+			}
+			avl(const avl &other) : _root(nullptr) { _root = copy(other._root); }
+			avl &operator=(const avl &other)
+			{
+				if (this != &other)
+				{
+					_root = copy(other._root);
+				}
+				return *this;
+			}
+			~avl()
+			{
+				_root = nullptr;
 			}
 			int		height(node_pointer head)
 			{
@@ -162,23 +165,9 @@ namespace ft
 				update(node->left);
 				update(node->right);
 			}
-			bool _contains(node_pointer node, mapped_type pair) const
-			{
-				if (node == nullptr)
-                	return false;
-				bool cmp = _comp(node->data->first, pair);
-				bool cmp1 = _comp(pair, node->data->first);
-				if (!cmp1 && !cmp)
-					return true;
-				if (!cmp)
-					return (_contains(node->left, pair));
-				if (cmp)
-					return (_contains(node->right, pair));
-				return true;
-			}
 			bool contains(mapped_type elem)
 			{
-				return (_contains(_root, elem));
+				return (contains(_root, elem));
 			}
 			bool insert(value_type pair)
 			{
@@ -186,94 +175,41 @@ namespace ft
 					return false;
 				else
 				{
-					_root = _insert(_root, pair);
+					_root = insert(_root, pair);
 					_node_size++;
 					return true;
 				}
 			}
-			node_pointer _insert(node_pointer node, value_type value)
+			node_pointer findMin(node_pointer node)
 			{
-				if (!node)
-					return (new_node(value));
-				else if (value.first < node->data->first)
-				{
-					node->left = _insert(node->left, value);
-					node->left->parent = node;
-				}
-				else if (value.first > node->data->first)
-				{
-					node->right = _insert(node->right, value);
-					node->right->parent = node;
-				}
-				else
-					node->data->second = value.second;
-				update(node);
-				return balance(node);
+				while (node->left)
+					node = node->left;
+				return node;
 			}
-			// bool remove(mapped_type pair)
-			// {
-			// 	if (!contains(pair))
-			// 		return false;
-			// 	else
-			// 	{
-			// 		_root = _remove(_root, pair);
-			// 		_node_size--;
-			// 		return true;
-			// 	}
-			// }
-			// node_pointer _remove(node_pointer node, mapped_type pair)
-			// {
-			// 	if (!node)
-			// 		return (NULL);
-			// 	if (pair < node->data->first)
-			// 	{
-			// 		node->left = _remove(node->left, pair);
-			// 		node->left->parent = node;
-			// 	}
-			// 	else if (pair > node->data->first)
-			// 	{
-			// 		node->right = _remove(node->right, pair);
-			// 		node->right->parent = node;
-			// 	}
-			// 	else
-			// 	{
-			// 		if (!node->left && !node->right)
-			// 		{
-			// 			_pair_alloc.destroy(node->data);
-			// 			_pair_alloc.deallocate(node->data, 1);
-			// 			_node_alloc.deallocate(node, 1);
-			// 			return (NULL);
-			// 		}
-			// 		else if (!node->left)
-			// 		{
-			// 			node_pointer tmp = node->right;
-			// 			_pair_alloc.destroy(node->data);
-			// 			_pair_alloc.deallocate(node->data, 1);
-			// 			_node_alloc.deallocate(node, 1);
-			// 			return (tmp);
-			// 		}
-			// 		else if (!node->right)
-			// 		{
-			// 			node_pointer tmp = node->left;
-			// 			_pair_alloc.destroy(node->data);
-			// 			_pair_alloc.deallocate(node->data, 1);
-			// 			_node_alloc.deallocate(node, 1);
-			// 			return (tmp);
-			// 		}
-			// 		else
-			// 		{
-			// 			node_pointer tmp = node->right;
-			// 			while (tmp->left)
-			// 				tmp = tmp->left;
-			// 			node->data->first = tmp->data->first;
-			// 			node->data->second = tmp->data->second;
-			// 			node->right = _remove(node->right, tmp->data->first);
-			// 			node->right->parent = node;
-			// 		}
-			// 	}
-			// 	update(node);
-			// 	return (balance(node));
-			// }
+			node_pointer findMax(node_pointer node)
+			{
+				while (node->right)
+					node = node->right;
+				return node;
+			}
+			bool remove(mapped_type pair)
+			{
+				if (!contains(pair))
+					return false;
+				else
+				{
+					_root = remove(_root, pair);
+					_node_size--;
+					return true;
+				}
+			}
+
+			void clear()
+			{
+				_root = nullptr;
+				_node_size = 0;
+			}
+			
 			void print2DUtil(node_pointer root, int space)
 			{
 				// Base case
@@ -318,5 +254,85 @@ namespace ft
 			pair_alloc 		_pair_alloc;
 			node_alloc		_node_alloc;
 			size_t			_node_size;
+		
+			bool contains(node_pointer node, mapped_type pair_key) const
+			{
+				if (node == nullptr)
+					return false;
+				bool cmp = _comp(node->data->first, pair_key);
+				bool cmp1 = _comp(pair_key, node->data->first);
+				if (!cmp1 && !cmp)
+					return true;
+				if (!cmp)
+					return (contains(node->left, pair_key));
+				if (cmp)
+					return (contains(node->right, pair_key));
+				return true;
+			}
+			node_pointer remove(node_pointer node, mapped_type pair_key)
+			{
+				if (!node)
+					return NULL;
+				if (_comp(pair_key, node->data->first))
+					node->left = remove(node->left, pair_key);
+
+				else if (_comp(node->data->first, pair_key))
+					node->right = remove(node->right, pair_key);
+				else
+				{
+					if (!node->left && !node->right)
+					{
+						_pair_alloc.destroy(node->data);
+						_pair_alloc.deallocate(node->data, 1);
+						_node_alloc.deallocate(node, 1);
+						return NULL;
+					}
+					else if (!node->left)
+					{
+						node_pointer tmp = node->right;
+						std::swap(node->data, tmp->data);
+						node->right = remove(node->right, pair_key);
+						return node;
+					}
+					else if (!node->right)
+					{
+						node_pointer tmp = node->left;
+						std::swap(node->data, tmp->data);
+						node->left = remove(node->left, pair_key);
+						return node;
+					}
+					else
+					{
+						node_pointer tmp = findMin(node->right);
+						std::swap(node->data, tmp->data);
+						node->right = remove(node->right, pair_key);
+					}
+				}
+				update(node);
+				return balance(node);
+			}
+			node_pointer insert(node_pointer node, value_type value)
+			{
+				if (!node)
+					return (new_node(value));
+				else if (value.first < node->data->first)
+				{
+					node->left = insert(node->left, value);
+					node->left->parent = node;
+				}
+				else if (value.first > node->data->first)
+				{
+					node->right = insert(node->right, value);
+					node->right->parent = node;
+				}
+				else
+					node->data->second = value.second;
+				update(node);
+				return balance(node);
+			}
+			pair_alloc get_pair_allocator() const
+			{
+				return _pair_alloc;
+			}
 	};
 };
