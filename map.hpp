@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 01:34:31 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/04/29 06:38:31 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/05 16:32:29 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,10 @@ namespace ft
 			typedef ft::Node<value_type>                                		node_type;
 			typedef node_type                                					*node_pointer;
 			
-			typedef ft::bidirectional_iterator<value_type, tree, node_type>   		iterator;
-			// typedef ft::const_bidirectional_iterator< node_type,  value_type>	const_iterator;
-			// typedef ft::reverse_iterator<iterator>          					reverse_iterator;
-			// typedef ft::reverse_iterator<const_iterator>    					const_reverse_iterator;
+			typedef ft::bidirectional_iterator<value_type, tree, node_type>   			iterator;
+			typedef ft::bidirectional_iterator<const value_type, tree, const node_type>	const_iterator;
+			typedef ft::reverse_iterator<iterator>          					reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>    					const_reverse_iterator;
 			typedef ptrdiff_t                               					difference_type;
 			typedef size_t                                  					size_type;
 			
@@ -60,7 +60,7 @@ namespace ft
 			// 		const allocator_type& alloc = allocator_type())
 			// {
 				
-			// }	
+			// }
 			map (const map& x)
 			{
 				_comp = x._comp;
@@ -72,12 +72,27 @@ namespace ft
 				_tree.~avl();
 			}
 
-			map& operator= (const map& x);
+			map& operator= (const map& x)
+			{
+				if (this != &x)
+				{
+					_comp = x._comp;
+					_alloc = x._alloc;
+					_tree = x._tree;
+				}
+				return *this;
+			}
 			/////////////////////// ITERATORS ////////////////////////////////
-			// iterator begin();
+			iterator begin()
+			{
+				return iterator(_tree.begin());
+			}
 			// const_iterator begin() const;
 
-			// iterator end();
+			iterator end()
+			{
+				return iterator(_tree.end());
+			}
 			// const_iterator end() const;
 			
 			// reverse_iterator rbegin();
@@ -97,7 +112,12 @@ namespace ft
 
 			////////////////////////// MODIFIERS /////////////////////////////
 			
-				// pair<iterator,bool> insert (const value_type& val);
+				pair<iterator,bool> insert (const value_type& pair)
+				{
+					bool sec = _tree.insert(pair);
+					iterator first = iterator(_tree.find(pair.first));
+					return (ft::make_pair(first, sec));
+				}
 				// iterator insert (iterator position, const value_type& val);
 				// template <class InputIterator>
 				// void insert (InputIterator first, InputIterator last);

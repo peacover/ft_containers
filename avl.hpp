@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/04/29 02:44:43 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/05 20:04:04 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 #include <unistd.h>
 #include <iostream>
 #include "pair.hpp"
+#include "bidirectional_iterator.hpp"
+#include "reverse_iterator.hpp"
 
 #define COUNT 10;
 namespace ft
@@ -31,8 +33,22 @@ namespace ft
 			int             height;
 
 		public :
-			Node() : data(nullptr), left(nullptr), right(nullptr), parent(nullptr), height(0) {};
+			Node() : data(NULL), left(NULL), right(NULL), parent(NULL), height(0) {};
 			~Node(){};
+			Node(const Node &other)
+			{
+				*this = other;
+			}
+			Node &operator=(const Node &other)
+			{
+				data = other.data;
+				left = other.left;
+				right = other.right;
+				parent = other.parent;
+				height = other.height;
+				return (*this);
+			}
+			Node(T *data) : data(data), left(NULL), right(NULL), parent(NULL), height(0) {};
 	}; 
 	template < class Key,                                  			// map::key_type
 		class T,                                       				// map::mapped_type
@@ -46,25 +62,74 @@ namespace ft
 		typedef ft::pair<const key_type, mapped_type>						value_type;
 		typedef Alloc 														pair_alloc;
         typedef typename Alloc::template rebind<Node<value_type> >::other	node_alloc;
+		typedef Node<value_type>											node_type;
 		typedef Node<value_type>											*node_pointer;
+		typedef ft::bidirectional_iterator<value_type, avl, node_type >   					iterator;
+		typedef ft::bidirectional_iterator<const value_type, avl,const  Node<value_type> >   		const_iterator;
+		typedef ft::reverse_iterator<iterator>          					reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>    					const_reverse_iterator;
 		public:
 			avl()
 			{
-				_root = nullptr;
+				_root = NULL;
 				_node_size = 0;
 			}
-			avl(const avl &other) : _root(nullptr) { _root = copy(other._root); }
-			avl &operator=(const avl &other)
-			{
-				if (this != &other)
-				{
-					_root = copy(other._root);
-				}
-				return *this;
-			}
+			avl(const avl &other) : _root(NULL) { *this = assign(other); }
+			// avl &operator=(const avl &other)
+			// {
+			// 	if (this != &other)
+			// 	{
+			// 		*this = assign(other);
+			// 	}
+			// 	return *this;
+			// }
 			~avl()
 			{
-				_root = nullptr;
+				// delete_tree(_root);
+			}
+			avl&    assign (avl const& x)
+			{
+				delete_tree();
+				_pair_alloc = x._pair_alloc;
+				_node_alloc = x._node_alloc;
+				_comp = x._comp;
+				for (const_iterator it = x.begin(); it != x.end(); it++)
+					insert(*it);
+				_node_size = x._node_size;
+				return *this;
+			}
+			int size() const
+			{
+				return (_node_size);
+			}
+			bool empty()
+			{
+				if (_node_size == 0)
+					return true;
+				return false;
+			}
+			void delete_tree()
+			{
+				_root = delete_tree(_root);
+				_node_size = 0;
+			}
+			node_pointer delete_tree(node_pointer node)
+			{
+				if (node != NULL)
+				{
+					delete_tree(node->left);
+					delete_tree(node->right);
+					delete_node(node);
+				}
+				return NULL;
+			}
+			void delete_node(node_pointer node)
+			{
+				_pair_alloc.destroy(node->data);
+				_pair_alloc.deallocate(node->data, 1);
+				node->data = NULL;
+				_node_alloc.deallocate(node, 1);
+				node = NULL;
 			}
 			int		height(node_pointer head)
 			{
@@ -180,18 +245,58 @@ namespace ft
 					return true;
 				}
 			}
+
 			node_pointer findMin(node_pointer node)
 			{
-				while (node->left)
+				while (node && node->left)
 					node = node->left;
 				return node;
 			}
 			node_pointer findMax(node_pointer node)
 			{
-				while (node->right)
+				while (node && node->right)
 					node = node->right;
 				return node;
 			}
+			
+			node_pointer findMin(node_pointer node) const
+			{
+				while (node && node->left)
+					node = node->left;
+				return node;
+			}
+			node_pointer findMax(node_pointer node) const
+			{
+				while (node && node->right)
+					node = node->right;
+				return node;
+			}
+
+			node_pointer find(key_type val)
+			{
+				if (contains(_root, val))
+					return (find(_root, val));
+				return NULL;
+			}
+			node_pointer find(key_type val) const
+			{
+				if (contains(_root, val))
+					return (find(_root, val));
+				return NULL;
+			}
+
+			node_pointer find(node_pointer node, key_type key)
+			{
+				if (node == NULL)
+					return NULL;
+				if (key < node->data->first)
+					return find(node->left, key);
+				else if (key > node->data->first)
+					return find(node->right, key);
+				else
+					return node;
+			}
+			
 			bool remove(mapped_type pair)
 			{
 				if (!contains(pair))
@@ -206,10 +311,32 @@ namespace ft
 
 			void clear()
 			{
-				_root = nullptr;
+				_root = NULL;
 				_node_size = 0;
 			}
-			
+
+			iterator begin()
+			{
+				// key_type min = findMin(_root)->data->first;
+				node_pointer first = find(findMin(_root)->data->first);
+				// node_pointer first = find(min);
+				return (iterator(first, this));
+			}
+			const_iterator begin() const
+			{
+				// key_type min = findMin(_root)->data->first;
+				node_pointer first = find(findMin(_root)->data->first);
+				// node_pointer first = find(min);
+            	return (const_iterator(first, this));
+			}
+			iterator end()
+			{
+				return (iterator(NULL, this)); 
+			}
+			const_iterator end() const
+			{
+				return (const_iterator(NULL, this)); 
+			}
 			void print2DUtil(node_pointer root, int space)
 			{
 				// Base case
@@ -257,7 +384,7 @@ namespace ft
 		
 			bool contains(node_pointer node, mapped_type pair_key) const
 			{
-				if (node == nullptr)
+				if (node == NULL)
 					return false;
 				bool cmp = _comp(node->data->first, pair_key);
 				bool cmp1 = _comp(pair_key, node->data->first);
