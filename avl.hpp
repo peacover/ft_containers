@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/05 20:04:04 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/06 17:56:37 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ namespace ft
 			// }
 			~avl()
 			{
-				// delete_tree(_root);
+				clear();
 			}
 			avl&    assign (avl const& x)
 			{
@@ -98,9 +98,13 @@ namespace ft
 				_node_size = x._node_size;
 				return *this;
 			}
-			int size() const
+			size_t size() const
 			{
 				return (_node_size);
+			}
+			size_t max_size() const
+			{
+				return (_node_alloc.max_size());
 			}
 			bool empty()
 			{
@@ -317,16 +321,14 @@ namespace ft
 
 			iterator begin()
 			{
-				// key_type min = findMin(_root)->data->first;
-				node_pointer first = find(findMin(_root)->data->first);
-				// node_pointer first = find(min);
+				key_type min = findMin(_root)->data->first;
+				node_pointer first = find(min);
 				return (iterator(first, this));
 			}
 			const_iterator begin() const
 			{
-				// key_type min = findMin(_root)->data->first;
-				node_pointer first = find(findMin(_root)->data->first);
-				// node_pointer first = find(min);
+				key_type min = findMin(_root)->data->first;
+				node_pointer first = find(min);
             	return (const_iterator(first, this));
 			}
 			iterator end()
@@ -336,6 +338,10 @@ namespace ft
 			const_iterator end() const
 			{
 				return (const_iterator(NULL, this)); 
+			}
+			node_pointer get_root() const
+			{
+				return _root;
 			}
 			void print2DUtil(node_pointer root, int space)
 			{

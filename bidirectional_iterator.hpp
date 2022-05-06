@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 03:37:50 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/05 19:36:31 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/06 17:19:49 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,14 +47,10 @@ namespace ft
 			{
 				if (this != &src)
 				{
-					_node = src._ptr;
+					_node = src._node;
 					_tree = src._tree;
 				}
 				return (*this);
-			}
-			pointer	base()
-			{
-				return (_node);
 			}
 			pointer operator->() const
             {
@@ -102,11 +98,11 @@ namespace ft
 			}
 			friend bool operator== (const bidirectional_iterator& lhs, const bidirectional_iterator& rhs)
 			{
-				return (lhs.base() == rhs.base());
+				return (lhs._node == rhs._node);
 			}
 			friend bool operator!= (const bidirectional_iterator& lhs, const bidirectional_iterator& rhs)
 			{
-				return (lhs.base() != rhs.base());
+				return (lhs._node != rhs._node);
 			}
     };
 }
