@@ -6,51 +6,52 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 03:37:50 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/06 17:19:49 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/09 17:17:32 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "pair.hpp"
+#include "random_access_iterator.hpp"
 
 namespace ft
 {
 	template <class Pair, class Tree, class Node>
-	class bidirectional_iterator
+	class bidirectional_iterator : public ft::iterator<std::bidirectional_iterator_tag, Pair>
 	{
 		public:
 
-			typedef typename std::iterator<std::bidirectional_iterator_tag, Pair>::iterator_category		iterator_category;
-        	typedef typename std::iterator<std::bidirectional_iterator_tag, Pair>::difference_type		difference_type;
-        	typedef typename std::iterator<std::bidirectional_iterator_tag, Pair>::value_type			value_type;
-			typedef typename std::iterator<std::bidirectional_iterator_tag, Pair>::pointer				pointer;
-			typedef	typename std::iterator<std::bidirectional_iterator_tag, Pair>::reference				reference;
-			typedef Tree 																				*tree;
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::iterator_category		iterator_category;
+        	typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::difference_type		difference_type;
+        	typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::value_type			value_type;
+			typedef typename ft::iterator<std::bidirectional_iterator_tag, Pair>::pointer				pointer;
+			typedef	typename ft::iterator<std::bidirectional_iterator_tag, Pair>::reference				reference;
+			typedef Tree const *																		tree;
 			typedef Node 																				*node_pointer;
 		
         private:
-			tree 			_tree;
+			tree 	_tree;
 			node_pointer	_node;
 
         public:
-            bidirectional_iterator() : _tree(NULL), _node(NULL) {}
-			bidirectional_iterator(node_pointer node) : _node(node) {}
-			bidirectional_iterator(node_pointer node, tree tree) : _node(node), _tree(tree) {}
-			bidirectional_iterator(const bidirectional_iterator &other) : _tree(other._tree), _node(other._node) {}
+            bidirectional_iterator() : _tree(), _node() {}
+			// bidirectional_iterator(node_pointer node) : _node(node) {}
+			bidirectional_iterator(node_pointer node, tree tree) : _tree(tree), _node(node) {}
+			bidirectional_iterator(bidirectional_iterator const &other) { *this = other; }
 			virtual ~bidirectional_iterator() {}
-			operator bidirectional_iterator<const Pair, Tree, const Node>() const
-			{
-				return bidirectional_iterator<const Pair, Tree, const Node>(_node, _tree);
-			}
 			bidirectional_iterator & operator=(bidirectional_iterator const & src)
 			{
 				if (this != &src)
 				{
-					_node = src._node;
 					_tree = src._tree;
+					_node = src._node;
 				}
 				return (*this);
+			}
+			operator bidirectional_iterator<const Pair, Tree, const Node>() const
+			{
+				return bidirectional_iterator<const Pair, Tree, const Node>(_node, _tree);
 			}
 			pointer operator->() const
             {
@@ -62,13 +63,18 @@ namespace ft
             }
 			bidirectional_iterator & operator++()
 			{
-				if (_node->right != NULL)
-					_node = _tree->findMin(_node->right);
+				if (!_node)
+					_node = _tree->findMin(_tree->get_root());
 				else
 				{
-					while (_node->parent != NULL && _node->parent->right == _node)
+					if (_node->right)
+						_node = _tree->findMin(_node->right);
+					else
+					{
+						while (_node->parent && _node->parent->right == _node)
+							_node = _node->parent;
 						_node = _node->parent;
-					_node = _node->parent;
+					}
 				}
 				return (*this);
 			}
@@ -80,13 +86,18 @@ namespace ft
 			}
 			bidirectional_iterator & operator--()
 			{
-				if (_node->left != NULL)
-					_node = _tree->findMax(_node->left);
+				if (!_node)
+					_node = _tree->findMax(_tree->get_root());
 				else
-				{
-					while (_node->parent != NULL && _node->parent->left == _node)
+				{	
+					if (_node->left)
+						_node = _tree->findMax(_node->left);
+					else
+					{
+						while (_node->parent && _node->parent->left == _node)
+							_node = _node->parent;
 						_node = _node->parent;
-					_node = _node->parent;
+					}
 				}
 				return (*this);
 			}

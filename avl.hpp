@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/06 17:56:37 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/09 18:41:39 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ namespace ft
 		typedef Node<value_type>											node_type;
 		typedef Node<value_type>											*node_pointer;
 		typedef ft::bidirectional_iterator<value_type, avl, node_type >   					iterator;
-		typedef ft::bidirectional_iterator<const value_type, avl,const  Node<value_type> >   		const_iterator;
+		typedef ft::bidirectional_iterator<const value_type, avl, const node_type >   	const_iterator;
 		typedef ft::reverse_iterator<iterator>          					reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>    					const_reverse_iterator;
 		public:
@@ -85,7 +85,7 @@ namespace ft
 			// }
 			~avl()
 			{
-				clear();
+				// clear();
 			}
 			avl&    assign (avl const& x)
 			{
@@ -106,7 +106,7 @@ namespace ft
 			{
 				return (_node_alloc.max_size());
 			}
-			bool empty()
+			bool empty() const
 			{
 				if (_node_size == 0)
 					return true;
@@ -134,18 +134,6 @@ namespace ft
 				node->data = NULL;
 				_node_alloc.deallocate(node, 1);
 				node = NULL;
-			}
-			int		height(node_pointer head)
-			{
-				int h = 0;
-				if (head != NULL)
-				{
-					int l_height = height(head->left);
-					int r_height = height(head->right);
-					int max_height = std::max(l_height, r_height);
-					h = max_height + 1;
-				}
-				return h;
 			}
 			node_pointer ll_rotation(node_pointer node)
 			{
@@ -205,6 +193,8 @@ namespace ft
 				tmp->right = NULL;
 				tmp->height = 0;
 				tmp->bf = 0;
+
+				// _node_size++;
 				return (tmp);
 			}
 			node_pointer balance(node_pointer node)
@@ -227,27 +217,88 @@ namespace ft
 			}
 			void update(node_pointer node)
 			{
-				if (node == NULL)
-					return;
-				node->height = 1 + std::max(height(node->left), height(node->right));
-				node->bf = height(node->left) - height(node->right);
-				update(node->left);
-				update(node->right);
+				int hl = -1;
+				int hr = -1;
+				if (node->left)
+					hl = node->left->height;
+				if (node->right)
+					hr = node->right->height;
+				node->height = 1 + std::max(hl, hr);
+				node->bf = hl - hr;
 			}
-			bool contains(mapped_type elem)
+			bool contains(key_type elem) const
 			{
 				return (contains(_root, elem));
 			}
-			bool insert(value_type pair)
+			
+			pair<node_pointer, bool> insert(value_type pair)
 			{
-				if (contains(pair.first))
-					return false;
-				else
-				{
-					_root = insert(_root, pair);
-					_node_size++;
-					return true;
+				// if (contains(pair.first))
+				// 	return false;
+				// else
+				// {
+					ft::pair<node_pointer, bool> tmp = insert(_root, pair);
+					if (tmp.second)
+					{
+						if (!_root)
+							_root = tmp.first;
+						_node_size++;
+					}
+					return (tmp);
+					// return true;
+				// }
+			}
+			pair<node_pointer, bool> insert(node_pointer node, value_type value)
+			{
+				if (!node){
+					return (ft::make_pair(new_node(value), true));
+					
 				}
+				if (_comp(value.first, node->data->first))
+				{
+					node->left = insert(node->left, value).first;
+					node->left->parent = node;
+					
+				}
+				else if (_comp(node->data->first, value.first))
+				{
+					node->right = insert(node->right, value).first;
+					node->right->parent = node;
+				}
+				else
+					return (ft::make_pair(node, false));
+				update(node);
+				return (ft::make_pair(balance(node), true));
+			}
+
+			bool contains(node_pointer node, key_type pair_key)
+			{
+				if (node == NULL)
+					return false;
+				bool cmp = _comp(node->data->first, pair_key);
+				bool cmp1 = _comp(pair_key, node->data->first);
+				if (!cmp1 && !cmp)
+					return true;
+				if (!cmp)
+					return (contains(node->left, pair_key));
+				if (cmp)
+					return (contains(node->right, pair_key));
+				return true;
+			}
+			
+			bool contains(node_pointer node, key_type pair_key) const
+			{
+				if (node == NULL)
+					return false;
+				bool cmp = _comp(node->data->first, pair_key);
+				bool cmp1 = _comp(pair_key, node->data->first);
+				if (!cmp1 && !cmp)
+					return true;
+				if (!cmp)
+					return (contains(node->left, pair_key));
+				if (cmp)
+					return (contains(node->right, pair_key));
+				return true;
 			}
 
 			node_pointer findMin(node_pointer node)
@@ -288,7 +339,6 @@ namespace ft
 					return (find(_root, val));
 				return NULL;
 			}
-
 			node_pointer find(node_pointer node, key_type key)
 			{
 				if (node == NULL)
@@ -300,17 +350,28 @@ namespace ft
 				else
 					return node;
 			}
-			
-			bool remove(mapped_type pair)
+
+			node_pointer find(node_pointer node, key_type key) const
 			{
-				if (!contains(pair))
-					return false;
+				if (node == NULL)
+					return NULL;
+				if (key < node->data->first)
+					return find(node->left, key);
+				else if (key > node->data->first)
+					return find(node->right, key);
 				else
+					return node;
+			}
+			
+			bool remove(key_type pair)
+			{
+				if (contains(pair))
 				{
 					_root = remove(_root, pair);
 					_node_size--;
 					return true;
 				}
+				return false;
 			}
 
 			void clear()
@@ -318,7 +379,6 @@ namespace ft
 				_root = NULL;
 				_node_size = 0;
 			}
-
 			iterator begin()
 			{
 				key_type min = findMin(_root)->data->first;
@@ -329,7 +389,15 @@ namespace ft
 			{
 				key_type min = findMin(_root)->data->first;
 				node_pointer first = find(min);
-            	return (const_iterator(first, this));
+            	return (iterator(first, this));
+			}
+			reverse_iterator rbegin()
+			{
+				return (reverse_iterator(end()));
+			}
+			const_reverse_iterator rbegin() const
+			{
+				return (const_reverse_iterator(end()));
 			}
 			iterator end()
 			{
@@ -339,9 +407,21 @@ namespace ft
 			{
 				return (const_iterator(NULL, this)); 
 			}
+			reverse_iterator rend()
+			{
+				return (reverse_iterator(begin()));
+			}
+			const_reverse_iterator rend() const
+			{
+				return (const_reverse_iterator(begin()));
+			}
 			node_pointer get_root() const
 			{
 				return _root;
+			}
+			pair_alloc get_pair_allocator() const
+			{
+				return _pair_alloc;
 			}
 			void print2DUtil(node_pointer root, int space)
 			{
@@ -388,21 +468,7 @@ namespace ft
 			node_alloc		_node_alloc;
 			size_t			_node_size;
 		
-			bool contains(node_pointer node, mapped_type pair_key) const
-			{
-				if (node == NULL)
-					return false;
-				bool cmp = _comp(node->data->first, pair_key);
-				bool cmp1 = _comp(pair_key, node->data->first);
-				if (!cmp1 && !cmp)
-					return true;
-				if (!cmp)
-					return (contains(node->left, pair_key));
-				if (cmp)
-					return (contains(node->right, pair_key));
-				return true;
-			}
-			node_pointer remove(node_pointer node, mapped_type pair_key)
+			node_pointer remove(node_pointer node, key_type pair_key)
 			{
 				if (!node)
 					return NULL;
@@ -444,28 +510,8 @@ namespace ft
 				update(node);
 				return balance(node);
 			}
-			node_pointer insert(node_pointer node, value_type value)
-			{
-				if (!node)
-					return (new_node(value));
-				else if (value.first < node->data->first)
-				{
-					node->left = insert(node->left, value);
-					node->left->parent = node;
-				}
-				else if (value.first > node->data->first)
-				{
-					node->right = insert(node->right, value);
-					node->right->parent = node;
-				}
-				else
-					node->data->second = value.second;
-				update(node);
-				return balance(node);
-			}
-			pair_alloc get_pair_allocator() const
-			{
-				return _pair_alloc;
-			}
-	};
+			
+			
+			
 };
+}
