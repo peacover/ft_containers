@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/09 18:41:39 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/13 06:25:34 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 #include "bidirectional_iterator.hpp"
 #include "reverse_iterator.hpp"
 
-#define COUNT 10;
 namespace ft
 {
 	template<class T>
@@ -35,20 +34,20 @@ namespace ft
 		public :
 			Node() : data(NULL), left(NULL), right(NULL), parent(NULL), height(0) {};
 			~Node(){};
-			Node(const Node &other)
-			{
-				*this = other;
-			}
-			Node &operator=(const Node &other)
-			{
-				data = other.data;
-				left = other.left;
-				right = other.right;
-				parent = other.parent;
-				height = other.height;
-				return (*this);
-			}
-			Node(T *data) : data(data), left(NULL), right(NULL), parent(NULL), height(0) {};
+			// Node(const Node &other)
+			// {
+			// 	*this = other;
+			// }
+			// Node &operator=(const Node &other)
+			// {
+			// 	data = other.data;
+			// 	left = other.left;
+			// 	right = other.right;
+			// 	parent = other.parent;
+			// 	height = other.height;
+			// 	return (*this);
+			// }
+			// Node(T *data) : data(data), left(NULL), right(NULL), parent(NULL), height(0) {};
 	}; 
 	template < class Key,                                  			// map::key_type
 		class T,                                       				// map::mapped_type
@@ -69,23 +68,26 @@ namespace ft
 		typedef ft::reverse_iterator<iterator>          					reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator>    					const_reverse_iterator;
 		public:
-			avl()
+			avl() : _root(NULL), _comp(), _pair_alloc(), _node_alloc(), _node_size(0) { }
+			avl(const avl &other) { *this = other; }
+			
+			avl &operator=(const avl &other)
 			{
-				_root = NULL;
-				_node_size = 0;
+				delete_tree();
+				_pair_alloc = other._pair_alloc;
+				_node_alloc = other._node_alloc;
+				_comp = other._comp;
+				// if (_root)
+				// {
+					for (const_iterator it = other.begin(); it != other.end(); it++)
+						insert(*it);
+				// }
+				_node_size = other._node_size;
+				return *this;
 			}
-			avl(const avl &other) : _root(NULL) { *this = assign(other); }
-			// avl &operator=(const avl &other)
-			// {
-			// 	if (this != &other)
-			// 	{
-			// 		*this = assign(other);
-			// 	}
-			// 	return *this;
-			// }
 			~avl()
 			{
-				// clear();
+				clear();
 			}
 			avl&    assign (avl const& x)
 			{
@@ -93,10 +95,19 @@ namespace ft
 				_pair_alloc = x._pair_alloc;
 				_node_alloc = x._node_alloc;
 				_comp = x._comp;
-				for (const_iterator it = x.begin(); it != x.end(); it++)
-					insert(*it);
+				if (_root)
+				{
+					for (const_iterator it = x.begin(); it != x.end(); it++)
+						insert(*it);
+				}
 				_node_size = x._node_size;
 				return *this;
+			}
+			void swap(avl &other)
+			{
+				std::swap(_node_size, other._node_size);
+				std::swap(_root, other._root);
+				std::swap(_comp, other._comp);
 			}
 			size_t size() const
 			{
@@ -226,6 +237,10 @@ namespace ft
 				node->height = 1 + std::max(hl, hr);
 				node->bf = hl - hr;
 			}
+			bool contains(key_type elem)
+			{
+				return (contains(_root, elem));
+			}
 			bool contains(key_type elem) const
 			{
 				return (contains(_root, elem));
@@ -233,72 +248,37 @@ namespace ft
 			
 			pair<node_pointer, bool> insert(value_type pair)
 			{
-				// if (contains(pair.first))
-				// 	return false;
-				// else
-				// {
-					ft::pair<node_pointer, bool> tmp = insert(_root, pair);
-					if (tmp.second)
-					{
-						if (!_root)
-							_root = tmp.first;
-						_node_size++;
-					}
-					return (tmp);
-					// return true;
-				// }
+				if (contains(pair.first))
+					return (ft::make_pair(_root, false));
+				ft::pair<node_pointer, bool> tmp = insert(_root, pair);
+				if (tmp.second)
+				{
+					if (!_root)
+						_root = tmp.first;
+					_node_size++;
+				}
+				else
+					tmp.second = false;
+				return (tmp);
 			}
 			pair<node_pointer, bool> insert(node_pointer node, value_type value)
 			{
-				if (!node){
+				if (!node)
 					return (ft::make_pair(new_node(value), true));
-					
-				}
 				if (_comp(value.first, node->data->first))
 				{
 					node->left = insert(node->left, value).first;
 					node->left->parent = node;
-					
 				}
 				else if (_comp(node->data->first, value.first))
 				{
 					node->right = insert(node->right, value).first;
 					node->right->parent = node;
 				}
-				else
-					return (ft::make_pair(node, false));
+				// else
+				// 	return (ft::make_pair(node, false));
 				update(node);
 				return (ft::make_pair(balance(node), true));
-			}
-
-			bool contains(node_pointer node, key_type pair_key)
-			{
-				if (node == NULL)
-					return false;
-				bool cmp = _comp(node->data->first, pair_key);
-				bool cmp1 = _comp(pair_key, node->data->first);
-				if (!cmp1 && !cmp)
-					return true;
-				if (!cmp)
-					return (contains(node->left, pair_key));
-				if (cmp)
-					return (contains(node->right, pair_key));
-				return true;
-			}
-			
-			bool contains(node_pointer node, key_type pair_key) const
-			{
-				if (node == NULL)
-					return false;
-				bool cmp = _comp(node->data->first, pair_key);
-				bool cmp1 = _comp(pair_key, node->data->first);
-				if (!cmp1 && !cmp)
-					return true;
-				if (!cmp)
-					return (contains(node->left, pair_key));
-				if (cmp)
-					return (contains(node->right, pair_key));
-				return true;
 			}
 
 			node_pointer findMin(node_pointer node)
@@ -327,6 +307,23 @@ namespace ft
 				return node;
 			}
 
+			value_type findMin_t(node_pointer node) 
+			{
+				if (node == NULL)
+					return (ft::make_pair(node->data->first, node->data->second));
+				while (node->left != NULL)
+					node = node->left;
+				return (*(node->data));
+			}
+			value_type findMax_t(node_pointer node) 
+			{
+				if (node == NULL)
+					return (ft::make_pair(node->data->first, node->data->second));
+				while (node->right != NULL)
+					node = node->right;
+				return (*(node->data));
+			}
+
 			node_pointer find(key_type val)
 			{
 				if (contains(_root, val))
@@ -341,28 +338,32 @@ namespace ft
 			}
 			node_pointer find(node_pointer node, key_type key)
 			{
-				if (node == NULL)
+				if (!node)
 					return NULL;
-				if (key < node->data->first)
-					return find(node->left, key);
-				else if (key > node->data->first)
-					return find(node->right, key);
-				else
+				if (key == node->data->first)
 					return node;
+				else
+				{
+					if (_comp(key, node->data->first))
+						return find(node->left, key);
+					else
+						return find(node->right, key);
+            	}
 			}
-
 			node_pointer find(node_pointer node, key_type key) const
 			{
-				if (node == NULL)
+				if (!node)
 					return NULL;
-				if (key < node->data->first)
-					return find(node->left, key);
-				else if (key > node->data->first)
-					return find(node->right, key);
-				else
+				if (key == node->data->first)
 					return node;
+				else
+				{
+					if (_comp(key, node->data->first))
+						return find(node->left, key);
+					else
+						return find(node->right, key);
+            	}
 			}
-			
 			bool remove(key_type pair)
 			{
 				if (contains(pair))
@@ -373,7 +374,6 @@ namespace ft
 				}
 				return false;
 			}
-
 			void clear()
 			{
 				_root = NULL;
@@ -430,7 +430,7 @@ namespace ft
 					return;
 			
 				// Increase distance between levels
-				space += COUNT;
+				space += 10;
 			
 				// Process right child first
 				print2DUtil(root->right, space);
@@ -438,13 +438,13 @@ namespace ft
 				// Print current node after space
 				// count
 				std::cout<< std::endl;
-				int i = COUNT;
+				int i = 10;
 				while (i < space)
 				{
 					std::cout<< " ";
 					i++;	
 				}
-				// for (int i = COUNT; i < space; i++)
+				// for (int i = 10; i < space; i++)
 				// {
 				// 	std::cout<< " ";
 				// }
@@ -461,57 +461,306 @@ namespace ft
 				node_pointer root = this->_root;
 				print2DUtil(root, 0);
 			}
+
 		private:
 			node_pointer	_root;
 			Compare			_comp;
 			pair_alloc 		_pair_alloc;
 			node_alloc		_node_alloc;
 			size_t			_node_size;
-		
-			node_pointer remove(node_pointer node, key_type pair_key)
+			
+			void		swap_nodes(node_pointer n1, node_pointer n2)
 			{
-				if (!node)
-					return NULL;
-				if (_comp(pair_key, node->data->first))
-					node->left = remove(node->left, pair_key);
+				// std::cout << "Before swap: "  <<std::endl;
+				// std::cout <<n1<<" "<<n1->data->first << " " << n1->data->second << " " << n1->parent << " " << n1->left << " " << n1->right <<" " << n1->bf << " " << n1->height << std::endl;
+				// std::cout <<n2<<" "<<n2->data->first << " " << n2->data->second << " " << n2->parent << " " << n2->left << " " << n2->right <<" " << n2->bf << " " << n2->height << std::endl;
+				bool n1_left_child_n2 = false;
+				bool n2_left_child_n1 = false;
+				bool n1_right_child_n2 = false;
+				bool n2_right_child_n1 = false;
+				
+				if (n1->left == n2)
+				{
+					n1_left_child_n2 = true;
+					n2->parent = NULL;
+					n1->left = NULL;
+				}
+				else if (n1->right == n2)
+				{
+					n1_right_child_n2 = true;
+					n2->parent = NULL;
+					n1->right = NULL;
+				}
+				else if (n2->left == n1)
+				{
+					n2_left_child_n1 = true;
+					n1->parent = NULL;
+					n2->left = NULL;
+				}
+				else if (n2->right == n1)
+				{
+					n2_right_child_n1 = true;
+					n1->parent = NULL;
+					n2->right = NULL;
+				}
+				if (n1->parent)
+				{
+					if (n1->parent->left == n1)
+						n1->parent->left = n2;
+					else
+						n1->parent->right = n2;
+				}
+				if (n2->parent)
+				{
+					if (n2->parent->left == n2)
+						n2->parent->left = n1;
+					else
+						n2->parent->right = n1;
+				}
 
-				else if (_comp(node->data->first, pair_key))
-					node->right = remove(node->right, pair_key);
+				std::swap(n1->parent, n2->parent);
+				if (n1->left)
+					n1->left->parent = n2;
+				if (n1->right)
+					n1->right->parent = n2;
+				if (n2->left)
+					n2->left->parent = n1;
+				if (n2->right)
+					n2->right->parent = n1;
+				std::swap(n1->left, n2->left);
+				std::swap(n1->right, n2->right);
+				std::swap(n1->bf, n2->bf);
+				std::swap(n1->height, n2->height);
+				if (n1_left_child_n2)
+				{
+					n2->left = n1;
+					n1->parent = n2;					
+				}
+				else if (n1_right_child_n2)
+				{
+					n2->right = n1;
+					n1->parent = n2;
+				}
+				else if (n2_left_child_n1)
+				{
+					n1->left = n2;
+					n2->parent = n1;
+				}
+				else if (n2_right_child_n1)
+				{
+					n1->right = n2;
+					n2->parent = n1;
+				}
+
+				// std::cout << "After swap: "  <<std::endl;
+				// std::cout << n1<<" "<< n1->data->first << " " << n1->data->second << " " << n1->parent << " " << n1->left << " " << n1->right <<" " << n1->bf << " " << n1->height << std::endl;
+				// std::cout << n2<<" "<< n2->data->first << " " << n2->data->second << " " << n2->parent << " " << n2->left << " " << n2->right <<" " << n2->bf << " " << n2->height << std::endl;
+			}
+			// node_pointer remove(node_pointer node, key_type pair_key)
+			// {
+			// 	// if (!node)
+			// 	// 	return NULL;
+			// 	// if (_comp(pair_key, node->data->first))
+			// 	// 	node->left = remove(node->left, pair_key);
+
+			// 	// else if (_comp(node->data->first, pair_key))
+			// 	// 	node->right = remove(node->right, pair_key);
+			// 	// else
+			// 	// {
+			// 	// 	if (!node->left && !node->right)
+			// 	// 	{
+			// 	// 		_pair_alloc.destroy(node->data);
+			// 	// 		_pair_alloc.deallocate(node->data, 1);
+			// 	// 		_node_alloc.deallocate(node, 1);
+			// 	// 		return NULL;
+			// 	// 	}
+			// 	// 	else if (!node->left)
+			// 	// 	{
+			// 	// 		node_pointer tmp = node->right;
+			// 	// 		// swap_nodes(node, tmp);
+			// 	// 		std::swap(node, tmp);
+			// 	// 		node->right = remove(node->right, pair_key);
+			// 	// 		return (node);
+			// 	// 	}
+			// 	// 	else if (!node->right)
+			// 	// 	{
+			// 	// 		node_pointer tmp = node->left;
+			// 	// 		// swap_nodes(node, tmp); // [5] // [7]
+			// 	// 		std::swap(node, tmp);
+			// 	// 		node->left = remove(node->left, pair_key);
+			// 	// 		return (node);
+			// 	// 	}
+			// 	// 	else
+			// 	// 	{
+			// 	// 		node_pointer tmp = findMin(node->right);
+			// 	// 		// swap_nodes(node, tmp);
+			// 	// 		std::swap(node, tmp);
+			// 	// 		node->right = remove(node, pair_key);
+			// 	// 		return (node);
+			// 	// 	}
+			// 	// }
+			// 	// update(node);
+			// 	// return balance(node);
+
+			// 	// if (!node)
+			// 	// {
+			// 	// 	// update(node);
+			// 	// 	// return balance(node);
+			// 	// 	return NULL;
+			// 	// }
+			// 	if (_comp(pair_key, node->data->first))
+			// 		node->left = remove(node->left, pair_key);
+
+			// 	else if (_comp(node->data->first, pair_key))
+			// 		node->right = remove(node->right, pair_key);
+			// 	else
+			// 	{
+			// 		// if (!node->left && !node->right)
+			// 		// {
+			// 		// 	// _pair_alloc.destroy(node->data);
+			// 		// 	// _pair_alloc.deallocate(node->data, 1);
+			// 		// 	// _node_alloc.deallocate(node, 1);
+			// 		// 	delete_node(node);
+			// 		// 	// node = NULL;
+			// 		// 	return NULL;
+			// 		// }
+			// 		// else if (!node->left)
+			// 		// {
+			// 		// 	node_pointer tmp = node->right;
+			// 		// 	std::swap(node->data, tmp->data);
+			// 		// 	node->right = remove(node->right, pair_key);
+			// 		// 	return node;
+			// 		// }
+			// 		// else if (!node->right)
+			// 		// {
+			// 		// 	node_pointer tmp = node->left;
+			// 		// 	std::swap(node->data, tmp->data);
+			// 		// 	node->left = remove(node->left, pair_key);
+			// 		// 	return node;
+			// 		// }
+			// 		// else
+			// 		// {
+			// 		// 	node_pointer tmp = findMin(node->right);
+			// 		// 	std::swap(node->data, tmp->data);
+			// 		// 	node->right = remove(node->right, pair_key);
+			// 		// }
+
+
+					
+			// 		// node_pointer t1 = findMin(node->right);
+			// 		// node_pointer t2 = findMax(node->left);
+			// 		// if (t1)
+			// 		// {
+			// 		// 	std::swap(node->data, t1->data);
+			// 		// 	delete_node(find(node->data->first));
+			// 		// 	// node->right = remove(node->right, pair_key);
+			// 		// 	// return node;
+			// 		// }
+			// 		// else if (t2)
+			// 		// {
+			// 		// 	std::swap(node->data, t1->data);
+			// 		// 	// node->left = remove(node->left, pair_key);
+			// 		// 	delete_node(find(node->data->first));
+			// 		// 	// return node;
+			// 		// }
+			// 		// else
+			// 		// {
+			// 		// 	delete_node(node);
+			// 		// 	// update(node);
+			// 		// 	return (NULL);
+			// 		// }
+			// 	}
+			// 	update(node);
+			// 	return (balance(node));
+			// }
+
+			node_pointer	remove(node_pointer node, key_type key)
+			{
+				if (node->left == NULL && node->right == NULL)
+				{
+					if (node == this->_root)
+						this->_root = NULL;
+					delete_node(node);
+					node = NULL;
+					return NULL;
+				}
+				node_pointer tmp;
+				if (_comp(key, node->data->first))
+					node->left = remove(node->left, key);
+				else if (_comp(node->data->first, key))
+					node->right = remove(node->right, key);
 				else
 				{
-					if (!node->left && !node->right)
+					if (node->left != NULL)
 					{
-						_pair_alloc.destroy(node->data);
-						_pair_alloc.deallocate(node->data, 1);
-						_node_alloc.deallocate(node, 1);
-						return NULL;
-					}
-					else if (!node->left)
-					{
-						node_pointer tmp = node->right;
+						tmp = findMax(node->left);
 						std::swap(node->data, tmp->data);
-						node->right = remove(node->right, pair_key);
-						return node;
-					}
-					else if (!node->right)
-					{
-						node_pointer tmp = node->left;
-						std::swap(node->data, tmp->data);
-						node->left = remove(node->left, pair_key);
-						return node;
+						node->left = remove(node->left, tmp->data->first);
 					}
 					else
 					{
-						node_pointer tmp = findMin(node->right);
+						tmp = findMin(node->right);
 						std::swap(node->data, tmp->data);
-						node->right = remove(node->right, pair_key);
+						node->right = remove(node->right, tmp->data->first);
 					}
 				}
-				update(node);
-				return balance(node);
+				return update_balance_remove(node);
 			}
 			
-			
-			
+			node_pointer update_balance_remove(node_pointer node)
+			{
+				node->height = 1 + std::max(height(node->left), height(node->right));
+				int bf = getBalanceFactor(node);
+
+				if (bf > 1 && getBalanceFactor(node->left) >= 0)
+					return ll_rotation(node);
+				if (bf > 1 && getBalanceFactor(node->left) < 0)
+					return rl_rotation(node);
+				if (bf < -1 && getBalanceFactor(node->right) <= 0)
+					return rr_rotation(node);
+				if (bf < -1 && getBalanceFactor(node->right) > 0)
+					return lr_rotation(node);
+				return node;
+			}
+			int height(node_pointer node)
+			{
+				if (node == NULL)
+					return 0;
+				return node->height;
+			}
+			int getBalanceFactor(node_pointer node)
+			{
+				if (node == NULL)
+					return 0;
+				return (height(node->left) - height(node->right));
+			}
+			bool contains(node_pointer node, key_type pair_key)
+			{
+				if (node == NULL)
+					return false;
+				bool cmp = _comp(node->data->first, pair_key);
+				bool cmp1 = _comp(pair_key, node->data->first);
+				if (!cmp1 && !cmp)
+					return true;
+				if (!cmp)
+					return (contains(node->left, pair_key));
+				if (cmp)
+					return (contains(node->right, pair_key));
+				return true;
+			}
+			bool contains(node_pointer node, key_type pair_key) const
+			{
+				if (node == NULL)
+					return false;
+				bool cmp = _comp(node->data->first, pair_key);
+				bool cmp1 = _comp(pair_key, node->data->first);
+				if (!cmp1 && !cmp)
+					return true;
+				if (!cmp)
+					return (contains(node->left, pair_key));
+				if (cmp)
+					return (contains(node->right, pair_key));
+				return true;
+			}		
 };
 }

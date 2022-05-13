@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 03:37:50 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/09 17:17:32 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/10 21:40:36 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,8 @@
 
 #include "pair.hpp"
 #include "random_access_iterator.hpp"
-
+#include <cstring>
+#include <memory>
 namespace ft
 {
 	template <class Pair, class Tree, class Node>
@@ -29,37 +30,42 @@ namespace ft
 			typedef	typename ft::iterator<std::bidirectional_iterator_tag, Pair>::reference				reference;
 			typedef Tree const *																		tree;
 			typedef Node 																				*node_pointer;
-		
+			typedef Pair																				*pair_pointer;
+			typedef Pair																				&pair_reference;
         private:
 			tree 	_tree;
 			node_pointer	_node;
 
         public:
-            bidirectional_iterator() : _tree(), _node() {}
+            bidirectional_iterator() : _tree(NULL), _node(NULL) {}
 			// bidirectional_iterator(node_pointer node) : _node(node) {}
 			bidirectional_iterator(node_pointer node, tree tree) : _tree(tree), _node(node) {}
-			bidirectional_iterator(bidirectional_iterator const &other) { *this = other; }
-			virtual ~bidirectional_iterator() {}
-			bidirectional_iterator & operator=(bidirectional_iterator const & src)
+			bidirectional_iterator(const bidirectional_iterator &other) { *this = other; }
+			~bidirectional_iterator() {}
+			bidirectional_iterator & operator=(const bidirectional_iterator & src)
 			{
 				if (this != &src)
 				{
-					_tree = src._tree;
 					_node = src._node;
+					_tree = src._tree;
 				}
 				return (*this);
+			}
+			node_pointer	get_node()
+			{
+				return (_node);
 			}
 			operator bidirectional_iterator<const Pair, Tree, const Node>() const
 			{
 				return bidirectional_iterator<const Pair, Tree, const Node>(_node, _tree);
 			}
-			pointer operator->() const
+			pair_pointer	operator->() const
             {
                 return (_node->data);
             }
-            reference operator*() const
+            pair_reference	operator*() const
             {
-                return (*_node->data);
+                return (*(_node->data));
             }
 			bidirectional_iterator & operator++()
 			{
@@ -115,5 +121,14 @@ namespace ft
 			{
 				return (lhs._node != rhs._node);
 			}
+			// bool operator==(const bidirectional_iterator &other) const
+			// {
+			// 	return (_node == other._node);
+			// }
+
+			// bool operator!=(const bidirectional_iterator &other) const
+			// {
+			// 	return (_node != other._node);
+			// }
     };
 }
