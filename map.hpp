@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/29 01:34:31 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/13 04:53:38 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/13 12:03:36 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ namespace ft
 			}
 			~map()
 			{
-				// _tree.~avl();
 			}
 
 			map& operator= (const map& x)
@@ -96,9 +95,7 @@ namespace ft
 				{
 					_alloc = x._alloc;
 					_comp = x._comp;
-					// _tree = _tree.assign(x._tree);
 					_tree.delete_tree();
-					// map(x.begin(), x.end());
 					insert(x.begin(), x.end());
 				}
 				
@@ -230,7 +227,7 @@ namespace ft
 
 				void clear()
 				{
-					_tree.clear();
+					_tree.delete_tree();
 				}
 			
 			////////////////////////// OBSERVERS /////////////////////////////
@@ -271,56 +268,72 @@ namespace ft
 			iterator lower_bound (const key_type& k)
 			{
 				// return iterator(_tree.lower_bound(k), &_tree);
-				iterator it;
-				key_type tmp;
-				for (it = _tree.begin(); it != _tree.end(); it++)
-				{
-					tmp = it->first;
-					if (tmp >= k)
-						return (it);
-				}
-				return (it);
+				// iterator it;
+				// key_type tmp;
+				// for (it = _tree.begin(); it != _tree.end(); it++)
+				// {
+				// 	tmp = it->first;
+				// 	if (tmp >= k)
+				// 		return (it);
+				// }
+				// return (it);
+				node_pointer tmp = _tree.lower_bound(_tree.get_root(), k);
+				if (tmp != NULL)
+					return iterator(tmp, &_tree);
+				return (end());
 			}
 			const_iterator lower_bound (const key_type& k) const
 			{
-				const_iterator it;
-				key_type tmp;
-				for (it = _tree.begin(); it != _tree.end(); it++)
-				{
-					tmp = it->first;
-					if (tmp >= k)
-						return (it);
-				}
-				return (it);
+				// const_iterator it;
+				// key_type tmp;
+				// for (it = _tree.begin(); it != _tree.end(); it++)
+				// {
+				// 	tmp = it->first;
+				// 	if (tmp >= k)
+				// 		return (it);
+				// }
+				// return (it);
+				node_pointer tmp = _tree.lower_bound(_tree.get_root(), k);
+				if (tmp != NULL)
+					return const_iterator(tmp, &_tree);
+				return (end());
 			}
 			
 			iterator upper_bound (const key_type& k)
 			{
-				iterator it;
-				key_type tmp;
-				if (_tree.size() == 0)
-					return (end());
-				for (it = _tree.begin(); it != _tree.end(); it++)
-				{
-					tmp = it->first;
-					if (tmp > k)
-						return (it);
-				}
-				return (it);
+				// iterator it;
+				// key_type tmp;
+				// if (_tree.size() == 0)
+				// 	return (end());
+				// for (it = _tree.begin(); it != _tree.end(); it++)
+				// {
+				// 	tmp = it->first;
+				// 	if (tmp > k)
+				// 		return (it);
+				// }
+				// return (it);
+				node_pointer tmp = _tree.upper_bound(_tree.get_root(), k);
+				if (tmp != NULL)
+					return iterator(tmp, &_tree);
+				return (end());
 			}
 			const_iterator upper_bound (const key_type& k) const
 			{
-				const_iterator it;
-				key_type tmp;
-				if (_tree.size() == 0)
-					return (end());
-				for (it = _tree.begin(); it != _tree.end(); it++)
-				{
-					tmp = it->first;
-					if (tmp > k)
-						return (it);
-				}
-				return (it);
+				// const_iterator it;
+				// key_type tmp;
+				// if (_tree.size() == 0)
+				// 	return (end());
+				// for (it = _tree.begin(); it != _tree.end(); it++)
+				// {
+				// 	tmp = it->first;
+				// 	if (tmp > k)
+				// 		return (it);
+				// }
+				// return (it);
+				node_pointer tmp = _tree.upper_bound(_tree.get_root(), k);
+				if (tmp != NULL)
+					return const_iterator(tmp, &_tree);
+				return (end());
 			}
 
 			pair<iterator,iterator> equal_range (const key_type& k)
@@ -341,8 +354,8 @@ namespace ft
 				return _tree.get_pair_allocator();
 			}
 
-			tree		_tree;
 		private:
+			tree		_tree;
 			Compare		_comp;
 			Alloc		_alloc;
 	};

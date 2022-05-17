@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/17 09:47:40 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/13 06:25:34 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/13 11:57:43 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,32 +77,18 @@ namespace ft
 				_pair_alloc = other._pair_alloc;
 				_node_alloc = other._node_alloc;
 				_comp = other._comp;
-				// if (_root)
-				// {
-					for (const_iterator it = other.begin(); it != other.end(); it++)
-						insert(*it);
-				// }
+				for (const_iterator it = other.begin(); it != other.end(); it++)
+					insert(*it);
 				_node_size = other._node_size;
 				return *this;
 			}
 			~avl()
 			{
-				clear();
-			}
-			avl&    assign (avl const& x)
-			{
 				delete_tree();
-				_pair_alloc = x._pair_alloc;
-				_node_alloc = x._node_alloc;
-				_comp = x._comp;
-				if (_root)
-				{
-					for (const_iterator it = x.begin(); it != x.end(); it++)
-						insert(*it);
-				}
-				_node_size = x._node_size;
-				return *this;
+				_root = NULL;
+				// _node_size = 0;
 			}
+			
 			void swap(avl &other)
 			{
 				std::swap(_node_size, other._node_size);
@@ -423,6 +409,62 @@ namespace ft
 			{
 				return _pair_alloc;
 			}
+			node_pointer successor(node_pointer node) const
+			{
+				if (node->right)
+					return findMin(node->right);
+				node_pointer tmp = node->parent;
+				while (tmp && node == tmp->right)
+				{
+					node = tmp;
+					tmp = tmp->parent;
+				}
+				return tmp;
+			}
+			node_pointer lower_bound(node_pointer node, key_type key)
+			{
+				node_pointer tmp = findMin(node);
+				while (tmp)
+				{
+					if (tmp->data->first >= key)
+						return tmp;
+					tmp = successor(tmp);
+				}
+				return NULL;
+			}
+			node_pointer lower_bound(node_pointer node, key_type key) const
+			{
+				node_pointer tmp = findMin(node);
+				while (tmp)
+				{
+					if (tmp->data->first >= key)
+						return tmp;
+					tmp = successor(tmp);
+				}
+				return NULL;
+			}
+			node_pointer upper_bound(node_pointer node, key_type key)
+			{
+				node_pointer tmp = findMin(node);
+				while (tmp)
+				{
+					if (tmp->data->first > key)
+						return tmp;
+					tmp = successor(tmp);
+				}
+				return NULL;
+			}
+			node_pointer upper_bound(node_pointer node, key_type key) const
+			{
+				node_pointer tmp = findMin(node);
+				while (tmp)
+				{
+					if (tmp->data->first > key)
+						return tmp;
+					tmp = successor(tmp);
+				}
+				return NULL;
+			}
 			void print2DUtil(node_pointer root, int space)
 			{
 				// Base case
@@ -556,124 +598,6 @@ namespace ft
 				// std::cout << n1<<" "<< n1->data->first << " " << n1->data->second << " " << n1->parent << " " << n1->left << " " << n1->right <<" " << n1->bf << " " << n1->height << std::endl;
 				// std::cout << n2<<" "<< n2->data->first << " " << n2->data->second << " " << n2->parent << " " << n2->left << " " << n2->right <<" " << n2->bf << " " << n2->height << std::endl;
 			}
-			// node_pointer remove(node_pointer node, key_type pair_key)
-			// {
-			// 	// if (!node)
-			// 	// 	return NULL;
-			// 	// if (_comp(pair_key, node->data->first))
-			// 	// 	node->left = remove(node->left, pair_key);
-
-			// 	// else if (_comp(node->data->first, pair_key))
-			// 	// 	node->right = remove(node->right, pair_key);
-			// 	// else
-			// 	// {
-			// 	// 	if (!node->left && !node->right)
-			// 	// 	{
-			// 	// 		_pair_alloc.destroy(node->data);
-			// 	// 		_pair_alloc.deallocate(node->data, 1);
-			// 	// 		_node_alloc.deallocate(node, 1);
-			// 	// 		return NULL;
-			// 	// 	}
-			// 	// 	else if (!node->left)
-			// 	// 	{
-			// 	// 		node_pointer tmp = node->right;
-			// 	// 		// swap_nodes(node, tmp);
-			// 	// 		std::swap(node, tmp);
-			// 	// 		node->right = remove(node->right, pair_key);
-			// 	// 		return (node);
-			// 	// 	}
-			// 	// 	else if (!node->right)
-			// 	// 	{
-			// 	// 		node_pointer tmp = node->left;
-			// 	// 		// swap_nodes(node, tmp); // [5] // [7]
-			// 	// 		std::swap(node, tmp);
-			// 	// 		node->left = remove(node->left, pair_key);
-			// 	// 		return (node);
-			// 	// 	}
-			// 	// 	else
-			// 	// 	{
-			// 	// 		node_pointer tmp = findMin(node->right);
-			// 	// 		// swap_nodes(node, tmp);
-			// 	// 		std::swap(node, tmp);
-			// 	// 		node->right = remove(node, pair_key);
-			// 	// 		return (node);
-			// 	// 	}
-			// 	// }
-			// 	// update(node);
-			// 	// return balance(node);
-
-			// 	// if (!node)
-			// 	// {
-			// 	// 	// update(node);
-			// 	// 	// return balance(node);
-			// 	// 	return NULL;
-			// 	// }
-			// 	if (_comp(pair_key, node->data->first))
-			// 		node->left = remove(node->left, pair_key);
-
-			// 	else if (_comp(node->data->first, pair_key))
-			// 		node->right = remove(node->right, pair_key);
-			// 	else
-			// 	{
-			// 		// if (!node->left && !node->right)
-			// 		// {
-			// 		// 	// _pair_alloc.destroy(node->data);
-			// 		// 	// _pair_alloc.deallocate(node->data, 1);
-			// 		// 	// _node_alloc.deallocate(node, 1);
-			// 		// 	delete_node(node);
-			// 		// 	// node = NULL;
-			// 		// 	return NULL;
-			// 		// }
-			// 		// else if (!node->left)
-			// 		// {
-			// 		// 	node_pointer tmp = node->right;
-			// 		// 	std::swap(node->data, tmp->data);
-			// 		// 	node->right = remove(node->right, pair_key);
-			// 		// 	return node;
-			// 		// }
-			// 		// else if (!node->right)
-			// 		// {
-			// 		// 	node_pointer tmp = node->left;
-			// 		// 	std::swap(node->data, tmp->data);
-			// 		// 	node->left = remove(node->left, pair_key);
-			// 		// 	return node;
-			// 		// }
-			// 		// else
-			// 		// {
-			// 		// 	node_pointer tmp = findMin(node->right);
-			// 		// 	std::swap(node->data, tmp->data);
-			// 		// 	node->right = remove(node->right, pair_key);
-			// 		// }
-
-
-					
-			// 		// node_pointer t1 = findMin(node->right);
-			// 		// node_pointer t2 = findMax(node->left);
-			// 		// if (t1)
-			// 		// {
-			// 		// 	std::swap(node->data, t1->data);
-			// 		// 	delete_node(find(node->data->first));
-			// 		// 	// node->right = remove(node->right, pair_key);
-			// 		// 	// return node;
-			// 		// }
-			// 		// else if (t2)
-			// 		// {
-			// 		// 	std::swap(node->data, t1->data);
-			// 		// 	// node->left = remove(node->left, pair_key);
-			// 		// 	delete_node(find(node->data->first));
-			// 		// 	// return node;
-			// 		// }
-			// 		// else
-			// 		// {
-			// 		// 	delete_node(node);
-			// 		// 	// update(node);
-			// 		// 	return (NULL);
-			// 		// }
-			// 	}
-			// 	update(node);
-			// 	return (balance(node));
-			// }
-
 			node_pointer	remove(node_pointer node, key_type key)
 			{
 				if (node->left == NULL && node->right == NULL)

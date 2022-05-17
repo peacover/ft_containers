@@ -248,6 +248,7 @@ int main()
         std::mt19937 generator(randDev());
         std::uniform_int_distribution<int> distr(0, 1e8);
 		ft::map<int, std::string>::iterator it;
+		std::map<int, std::string>::iterator it2;
 
         for (size_t i = 0; i < 1e6; i++)
         {
@@ -255,21 +256,21 @@ int main()
             ft_m3.insert(ft::make_pair(i, "string1"));
         }
 
-        for (size_t i = 0; i < 1e6; ++i)
-        {
-            int n = distr(generator);
-			// std::cout << "------------------------------------" << std::endl;
-			// std::cout << "erase : " << i << std::endl;
-			// ft_m3._tree.print2D();
-            int ret1 = m3.erase(n);
-            int ret2 = ft_m3.erase(n);
+        // for (size_t i = 0; i < 1e6; ++i)
+        // {
+        //     int n = distr(generator);
+		// 	// std::cout << "------------------------------------" << std::endl;
+		// 	// std::cout << "erase : " << i << std::endl;
+		// 	// ft_m3._tree.print2D();
+        //     int ret1 = m3.erase(n);
+        //     int ret2 = ft_m3.erase(n);
 
-            if (ret1 != ret2)
-            {
-                cond = false;
-                break;
-            }
-        }
+        //     if (ret1 != ret2)
+        //     {
+        //         cond = false;
+        //         break;
+        //     }
+        // }
 		// ft_m3._tree.print2D();
 		// std::cout << "------------------------------------" << std::endl;
 		// m3.erase(1);
@@ -279,17 +280,17 @@ int main()
         //     ft_m3.erase(ft_m3.begin(), ft_m3.end());
         //     ft_m3.erase(ft_m3.begin(), ft_m3.end());
         // }
-        if (!m3.empty())
-        {
-            m3.erase(m3.begin(), m3.end());
-            m3.erase(m3.begin(), m3.end());
-        }
-		// ft_m3._tree.print2D();
-		if (!ft_m3.empty())
-        {
-            ft_m3.erase(ft_m3.begin(), ft_m3.end());
-            ft_m3.erase(ft_m3.begin(), ft_m3.end());
-        }
+        // if (!m3.empty())
+        // {
+        //     m3.erase(m3.begin(), m3.end());
+        //     m3.erase(m3.begin(), m3.end());
+        // }
+		// // ft_m3._tree.print2D();
+		// if (!ft_m3.empty())
+        // {
+        //     ft_m3.erase(ft_m3.begin(), ft_m3.end());
+        //     ft_m3.erase(ft_m3.begin(), ft_m3.end());
+        // }
         // if (!ft_m3.empty())
         // {
 		// 	// int count = 0;
@@ -332,8 +333,15 @@ int main()
 		// 	ft_m3.erase(it->first);
 		// 	// std::cout << it->first << " | " << it->second << std::endl;
 		// }
-		std::cout << "SIZE  : " << m3.size() << " M_SIZE : " << ft_m3.size() << std::endl;
+		// std::cout << "SIZE  : " << m3.size() << " M_SIZE : " << ft_m3.size() << std::endl;
         // cond = cond && (m3.size() == ft_m3.size() && compareMaps(m3.begin(), m3.end(), ft_m3.begin(), ft_m3.end()));
-        std::cout << (cond);
+
+		// it = ft_m3.end();
+		// std::cout << (it)->first << std::endl;
+
+		// it = ft_m3.lower_bound(2);
+		// std::cout << it->first ;
+		system("leaks a.out");
+        // std::cout << (cond);
 }
 

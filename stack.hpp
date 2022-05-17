@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/13 05:16:53 by yer-raki          #+#    #+#             */
-/*   Updated: 2022/05/13 06:27:01 by yer-raki         ###   ########.fr       */
+/*   Updated: 2022/05/13 07:00:24 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,5 @@ namespace ft
     bool operator>= (const stack<T,Container>& lhs, const stack<T,Container>& rhs)
     {
         return lhs.get_container() >= rhs.get_container();
-    }
-    
+    }  
 }
